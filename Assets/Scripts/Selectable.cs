@@ -5,23 +5,22 @@ using UnityEngine;
 public class Selectable : MonoBehaviour
 {
     public bool isSelected;
-    
+    public Card card;
+
     // Start is called before the first frame update
     void Start()
     {
-
+        card = GetComponent<Card>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isSelected) {
-
-        }
     }
 
     void OnMouseDown() {
-        GetComponent<Card>().isHidden=false;
+        GetComponent<Card>().isHidden=!card.isHidden;
+;
     }
 
     void OnMouseOver() {

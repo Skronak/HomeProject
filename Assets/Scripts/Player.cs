@@ -1,21 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     public Sprite sprite;
     public string id;
     public string pseudo;
-
+    public TextMesh textMesh;
+        
     void Start()
     {
-        GetComponent<SpriteRenderer>().sprite = sprite;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 }

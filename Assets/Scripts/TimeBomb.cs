@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class TimeBomb : MonoBehaviour
@@ -8,11 +7,13 @@ public class TimeBomb : MonoBehaviour
     public static string[] cards = new string[] { "1", "2", "3" };
 
     public List<Card> deck = new List<Card>();
-    public string[] players;
+    public List<GameObject> emptyPlayerSlot;
     public List<Card> discoveredCards = new List<Card>();
+    public GameObject playerPrefab;
     public GameObject cardPrefab;
 
-    public void startGame()
+
+    public void startGame() 
     {
     }
 
@@ -23,6 +24,7 @@ public class TimeBomb : MonoBehaviour
     public void topCard()
     {
     }
+
 
     public void getNewHand(List<string> hand)
     {   
@@ -39,7 +41,7 @@ public class TimeBomb : MonoBehaviour
             startPosition = newCard.transform.position.x;
         }
 
-        addAnotherPlayerHand(players[0], hand.Count);
+//        addAnotherPlayerHand(emptyPlayerSlotlot[0], hand.Count);
 
     }
 
@@ -52,8 +54,19 @@ public class TimeBomb : MonoBehaviour
         }
     }
 
-    public void GenerateCharacters()
+    public GameObject AddPlayer(string id)
     {
+        GameObject location = emptyPlayerSlot[0];
+        GameObject gameObject = Instantiate(playerPrefab,  new Vector3(location.transform.position.x, location.transform.position.y, 2),Quaternion.identity);
+        gameObject.GetComponent<Player>().textMesh.text = id.ToString(); 
+        emptyPlayerSlot.RemoveAt(0);
+
+        return gameObject;
+    }
+
+    public void RemovePlayer(GameObject gameObject)
+    {
+        emptyPlayerSlot.Add(playerPrefab);
     }
 
     // Start is called before the first frame update

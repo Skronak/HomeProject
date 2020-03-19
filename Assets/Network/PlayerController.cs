@@ -18,17 +18,12 @@ public class PlayerController : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.A)) 
 		{
-			message.AddField("message","Hello! I am " + socket.sid);
-			socket.Emit("hello", message);
-			message.Clear ();
-
-            socket.Emit("handRequest");
+			socket.Emit("register", JSONObject.CreateStringObject("test00"));
 		}
 
 		if (Input.GetKeyDown(KeyCode.Z)) 
 		{
 			socket.Emit("startGame");
-			message.Clear ();
 		}
 
 		if (Input.GetKeyDown(KeyCode.E)) {
@@ -38,8 +33,7 @@ public class PlayerController : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.R)) 
 		{
-			socket.Emit("playerName", JSONObject.CreateStringObject("test00"));
-			message.Clear ();
+            socket.Emit("handRequest");
 		}
 
 
