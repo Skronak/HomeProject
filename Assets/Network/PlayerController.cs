@@ -35,5 +35,13 @@ public class PlayerController : MonoBehaviour
 //			message.AddField("target", );
 			socket.Emit("revealCard");
 		}
+
+		if (Input.GetKeyDown(KeyCode.R)) 
+		{
+			socket.Emit("playerName", JSONObject.CreateStringObject("test00"));
+			message.Clear ();
+		}
+
+
 	}
 }

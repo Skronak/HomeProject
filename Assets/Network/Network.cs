@@ -23,6 +23,7 @@ public class Network : MonoBehaviour
         socket.On("playerDisconnection", onPlayerDisconnection);
         socket.On("newHand", onNewHandReceived);
 		socket.On("roleAssignement", onRoleAssignement);
+		socket.On("userList", onPlayerList);
 
 		timeBomb = GameObject.Find("Game").GetComponent<TimeBomb>();
 	}
@@ -36,9 +37,20 @@ public class Network : MonoBehaviour
 	void onPlayerConnection(SocketIOEvent evt)
 	{
 		Debug.Log ("Player is connected: " + evt.data.GetField("id"));
-        players.Add(evt.data["id"].ToString(), null);
+        players.Add(evt.data["id"].ToString(), null); // doublons
     }
 
+	void onPlayerList(SocketIOEvent evt) {
+		Debug.Log("Players in session: " + evt.data.GetField("userList").ToString());
+		string data = evt.data.ToString();
+		UserList playerList = new UserList();
+		playerList = JsonUtility.FromJson<UserList>(data);
+		Player[] dataArray = getJsonArray<Player>(data);
+//		JsonUtility.FromJsonOverwrite (data, playerList);
+
+		//timeBomb.players = playerList;
+	}
+	
 	void onPlayerDisconnection(SocketIOEvent evt)
 	{
 		Debug.Log ("Player is disconnected: " + evt.data.GetField("id"));
@@ -51,9 +63,10 @@ public class Network : MonoBehaviour
 
     void onNewHandReceived(SocketIOEvent evt)
     {
-		Debug.Log("Hand received");
 		JSONObject data = evt.data.GetField("hand");	
-		string[] dataArray = JsonHelper.getJsonArray<string>(data.ToString());
+		Debug.Log(data);
+
+		string[] dataArray = getJsonArray<string>(data.ToString());
 		List<string> hand = new List<string>(dataArray); 
 
 		timeBomb.getNewHand(hand);
@@ -69,20 +82,27 @@ public class Network : MonoBehaviour
 		Debug.Log("You are in team: " + evt.data.GetField("role"));
 	}
 
-	 public class JsonHelper
- {
-     public static T[] getJsonArray<T>(string json)
-     {
-         string newJson = "{ \"array\": " + json + "}";
-         Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
-         return wrapper.array;
-     }
- 
-     [System.Serializable]
-     private class Wrapper<T>
-     {
-         public T[] array;
-     }
- }
+	public static T[] getJsonArray<T>(string json)
+	{
+		string newJson = "{ \"array\": " + json + "}";
+		Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
+		return wrapper.array;
+	}
+	
+	[System.Serializable]
+	private class Wrapper<T>
+	{
+		public T[] array;
+	}
 
+	[System.Serializable]
+	public class Player {
+		public string id { get; set; }
+		public string playerName { get; set; }
+	}
+
+	[System.Serializable]
+	public class UserList {
+    	public List <Player> userList;
+	}
 }

@@ -8,7 +8,7 @@ public class TimeBomb : MonoBehaviour
     public static string[] cards = new string[] { "1", "2", "3" };
 
     public List<Card> deck = new List<Card>();
-    public List<Player> players = new List<Player>();
+    public string[] players;
     public List<Card> discoveredCards = new List<Card>();
     public GameObject cardPrefab;
 
@@ -22,7 +22,6 @@ public class TimeBomb : MonoBehaviour
 
     public void topCard()
     {
-
     }
 
     public void getNewHand(List<string> hand)
@@ -30,10 +29,27 @@ public class TimeBomb : MonoBehaviour
         float startPosition = transform.position.x - 3;
         for(int i=0; i<hand.Count; i++) {
             GameObject newCard = Instantiate(cardPrefab, new Vector3(startPosition + 3, transform.position.y, 2), Quaternion.identity);
-            cardPrefab.GetComponent<Card>().setCardType(hand[i]);
+            if(hand[i].Equals("bomb")){
+                newCard.GetComponent<Card>().setCardType(CardTypeEnum.Bomb);
+            } else if (hand[i].Equals("wire")) {
+                newCard.GetComponent<Card>().setCardType(CardTypeEnum.Wire);
+            } else {
+                newCard.GetComponent<Card>().setCardType(CardTypeEnum.Empty);
+            }
             startPosition = newCard.transform.position.x;
         }
 
+        addAnotherPlayerHand(players[0], hand.Count);
+
+    }
+
+    public void addAnotherPlayerHand(string playerId, int nbCard) {
+        float startPosition = transform.position.x - 3;
+        for(int i=0; i < nbCard; i++) {
+            GameObject newCard = Instantiate(cardPrefab, new Vector3(startPosition + 3, transform.position.y+5, 2), Quaternion.identity);
+            newCard.GetComponent<Card>().playerId = playerId;
+            startPosition = newCard.transform.position.x;
+        }
     }
 
     public void GenerateCharacters()
