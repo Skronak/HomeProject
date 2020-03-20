@@ -11,7 +11,7 @@ public class TimeBomb : MonoBehaviour
     public List<Card> discoveredCards = new List<Card>();
     public GameObject playerPrefab;
     public GameObject cardPrefab;
-
+    public GameObject emptySeatPrefab;
 
     public void startGame() 
     {
@@ -59,14 +59,16 @@ public class TimeBomb : MonoBehaviour
         GameObject location = emptyPlayerSlot[0];
         GameObject gameObject = Instantiate(playerPrefab,  new Vector3(location.transform.position.x, location.transform.position.y, 2),Quaternion.identity);
         gameObject.GetComponent<Player>().textMesh.text = id.ToString(); 
+
         emptyPlayerSlot.RemoveAt(0);
 
         return gameObject;
     }
 
-    public void RemovePlayer(GameObject gameObject)
+    public void RemovePlayer(Vector3 disconnectedPosition)
     {
-        emptyPlayerSlot.Add(playerPrefab);
+        GameObject emptySeat = Instantiate(emptySeatPrefab, disconnectedPosition, Quaternion.identity);
+        emptyPlayerSlot.Add(emptySeat);
     }
 
     // Start is called before the first frame update

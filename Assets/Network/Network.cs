@@ -67,6 +67,9 @@ public class Network : MonoBehaviour
         string id = evt.data["id"].ToString();
         Debug.Log("Player is disconnected: " + id);
         GameObject go = serverObjects[id];
+
+        timeBomb.RemovePlayer(go.transform.position);
+
         Destroy(go);
         serverObjects.Remove(id);
     }
