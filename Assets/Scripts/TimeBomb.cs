@@ -82,7 +82,7 @@ public class TimeBomb : MonoBehaviour
         GameObject location = emptyPlayerSlot[0];
         GameObject gameObject = Instantiate(playerPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
 
-        gameObject.GetComponent<Player>().textMesh.text = pseudo;
+        gameObject.GetComponent<Player>().textMesh.text = pseudo.Replace("\"", string.Empty);
 
         emptyPlayerSlot.RemoveAt(0);
 
