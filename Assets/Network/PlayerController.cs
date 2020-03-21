@@ -16,11 +16,13 @@ public class PlayerController : MonoBehaviour
 	
 	void Update () 
 	{
+		// demande au serveur de logger les utilisateurs dans la partie
 		if (Input.GetKeyDown(KeyCode.A)) 
 		{
-			socket.Emit("register", JSONObject.CreateStringObject("test00"));
+			socket.Emit("logUser");
 		}
 
+		// declenche manuellement le début d'une partie 
 		if (Input.GetKeyDown(KeyCode.Z)) 
 		{
 			socket.Emit("startGame");

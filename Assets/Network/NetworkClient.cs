@@ -88,7 +88,7 @@ namespace Project.Networking
             string[] dataArray = getJsonArray<string>(data.ToString());
             List<string> hand = new List<string>(dataArray);
 
-            timeBomb.getNewHand(hand);
+//            timeBomb.getNewHand(hand);
         }
 
         void onStartGame(SocketIOEvent evt)

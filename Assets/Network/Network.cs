@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using SocketIO;
 
@@ -9,6 +8,7 @@ public class Network : MonoBehaviour
     Dictionary<string, GameObject> serverObjects;
 
     private TimeBomb timeBomb;
+    private string pseudoForServer;
 
     [Header("Network Client")]
     [SerializeField]
@@ -44,10 +44,11 @@ public class Network : MonoBehaviour
     void onPlayerConnection(SocketIOEvent evt)
     {
         string id = evt.data["id"].ToString();
+        string pseudo = evt.data["username"].ToString(); // TODO: a mapper dans un objet
         Debug.Log("Player is connected: " + id);
 
         if (!serverObjects.ContainsKey(id)) {			
-            GameObject go = timeBomb.AddPlayer(id);
+            GameObject go = timeBomb.AddPlayer(pseudo);
             go.transform.SetParent(networkContainer);
             serverObjects.Add(id, go);
         }
@@ -87,7 +88,8 @@ public class Network : MonoBehaviour
         string[] dataArray = getJsonArray<string>(data.ToString());
         List<string> hand = new List<string>(dataArray);
 
-        timeBomb.getNewHand(hand);
+        timeBomb.GeneratePlayerHand(hand);
+        timeBomb.GenerateOtherPlayersHand(serverObjects, hand.Count);
     }
 
     void onStartGame(SocketIOEvent evt)
@@ -98,7 +100,10 @@ public class Network : MonoBehaviour
 
     void onRoleAssignement(SocketIOEvent evt)
     {
-        Debug.Log("You are in team: " + evt.data.GetField("role"));
+        string role = evt.data.GetField("role").ToString();
+        Debug.Log("Role assigned: " + role);
+
+        timeBomb.showRole(role);
     }
 
     public static T[] getJsonArray<T>(string json)
@@ -106,6 +111,18 @@ public class Network : MonoBehaviour
         string newJson = "{ \"array\": " + json + "}";
         Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
         return wrapper.array;
+    }
+
+    public void joinGame() {
+        if (pseudoForServer == null) {
+            pseudoForServer = "noname";
+        }
+
+        socket.Emit("register", JSONObject.CreateStringObject(pseudoForServer));
+    }
+
+    public void setPseudoForServer(string pseudo) {
+        pseudoForServer = pseudo;
     }
 
     [System.Serializable]
