@@ -10,9 +10,7 @@ public class Network : MonoBehaviour
     private TimeBomb timeBomb;
     private string pseudoForServer;
 
-    [Header("Network Client")]
-    [SerializeField]
-    private Transform networkContainer;
+    public GameObject playersContainer;
 
     public static string ClientID { get; private set; }
 
@@ -23,6 +21,7 @@ public class Network : MonoBehaviour
 
         // This line will set up the listener function
         socket.On("connectionEstabilished", onConnectionEstabilished);
+        socket.On("playerConnectionTest", ontt);
         socket.On("foreignMessage", onForeignMessage);
         socket.On("playerConnection", onPlayerConnection);
         socket.On("playerDisconnection", onPlayerDisconnection);
@@ -32,6 +31,11 @@ public class Network : MonoBehaviour
         socket.On("startGame", onStartGame);
 
         timeBomb = GameObject.Find("Game").GetComponent<TimeBomb>();
+    }
+
+    void ontt(SocketIOEvent evt)
+    {
+        Debug.Log("player connection test");
     }
 
     // This is the listener function definition
@@ -44,12 +48,13 @@ public class Network : MonoBehaviour
     void onPlayerConnection(SocketIOEvent evt)
     {
         string id = evt.data["id"].ToString();
-        string pseudo = evt.data["username"].ToString(); // TODO: a mapper dans un objet
+        string pseudo = evt.data["username"].ToString();
         Debug.Log("Player is connected: " + id);
 
         if (!serverObjects.ContainsKey(id)) {			
             GameObject go = timeBomb.AddPlayer(pseudo);
-            go.transform.SetParent(networkContainer);
+            go.name = id;
+            go.transform.parent = playersContainer.transform;
             serverObjects.Add(id, go);
         }
     }

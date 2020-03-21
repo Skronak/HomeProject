@@ -15,6 +15,7 @@ public class TimeBomb : MonoBehaviour
     public GameObject playerCardSpawn;
     public GameObject playerHandSpawn;
     public GameObject[] rolesImage;
+    Dictionary<string, GameObject> serverObjects;
 
     public void startGame()
     {
@@ -80,9 +81,9 @@ public class TimeBomb : MonoBehaviour
     public GameObject AddPlayer(string pseudo)
     {
         GameObject location = emptyPlayerSlot[0];
-        GameObject gameObject = Instantiate(playerPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
-
-        gameObject.GetComponent<Player>().textMesh.text = pseudo.Replace("\"", string.Empty);
+        GameObject newPlayer = Instantiate(playerPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
+        Player player = newPlayer.GetComponent<Player>();
+        player.nameTextMesh.text = pseudo.Replace("\"", string.Empty);
 
         emptyPlayerSlot.RemoveAt(0);
 
@@ -96,7 +97,6 @@ public class TimeBomb : MonoBehaviour
     }
 
     public void showRole(string role) {
-        Debug.Log("r" + role + "r");
         if (role.Equals("\"moriarty\"")) {
             (rolesImage[0]).active = false;
         }

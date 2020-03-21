@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
+[System.Serializable]
 public class Player : MonoBehaviour
 {
-    public Sprite sprite;
+    public Sprite avatarSprite;
     public string id;
-    public string pseudo;
-    public TextMesh textMesh;
+    public TextMesh nameTextMesh;
 }
