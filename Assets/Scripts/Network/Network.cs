@@ -21,7 +21,7 @@ public class Network : MonoBehaviour
         socket.On("playerConnection", onPlayerConnection);
         socket.On("playerDisconnection", onPlayerDisconnection);
         socket.On("newHand", onNewHandReceived);
-        socket.On("roleAssignement", onRoleAssignement);
+        socket.On("roleAssigment", onRoleAssignement);
         socket.On("userList", onPlayerList);
         socket.On("startGame", onStartGame);
 

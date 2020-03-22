@@ -15,13 +15,12 @@ public class TimeBomb : MonoBehaviour
     public GameObject playerCardSpawn;
     public GameObject playerHandSpawn;
     public GameObject[] rolesImage;
-    public Dictionary<string, GameObject> playersMap;
+    public Dictionary<string, GameObject> playerMap;
     public GameObject playersContainer;
-
 
     void Start()
     {
-        playersMap = new Dictionary<string, GameObject>();
+        playerMap = new Dictionary<string, GameObject>();
     }
 
     public void startGame()
@@ -72,7 +71,7 @@ public class TimeBomb : MonoBehaviour
 
     public void GenerateOtherPlayersHand(int nbCard)
     {
-        foreach (KeyValuePair<string, GameObject> player in playersMap)
+        foreach (KeyValuePair<string, GameObject> player in playerMap)
         {
             Vector3 lastPosition = player.Value.transform.GetChild(0).gameObject.transform.position; // accede a CardSpawn du prefab...
 
@@ -89,7 +88,7 @@ public class TimeBomb : MonoBehaviour
     public void AddPlayer(string id, string pseudo)
     {
 
-        if (!playersMap.ContainsKey(id)) {			
+        if (!playerMap.ContainsKey(id)) {			
             GameObject location = emptyPlayerSlot[0];
             GameObject newPlayer = Instantiate(playerPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
             Player player = newPlayer.GetComponent<Player>();
@@ -98,16 +97,16 @@ public class TimeBomb : MonoBehaviour
             emptyPlayerSlot.RemoveAt(0);
             newPlayer.name = id;
             newPlayer.transform.parent = playersContainer.transform;
-            playersMap.Add(id, newPlayer);
+            playerMap.Add(id, newPlayer);
         }
     }
 
     public void RemovePlayer(string id)
     {
-        GameObject go = playersMap[id];
-        Vector3 disconnectedPosition = playersMap[id].transform.position;
+        GameObject go = playerMap[id];
+        Vector3 disconnectedPosition = playerMap[id].transform.position;
         Destroy(go);
-        playersMap.Remove(id);
+        playerMap.Remove(id);
 
         GameObject emptySeat = Instantiate(emptySeatPrefab, disconnectedPosition, Quaternion.identity);
         emptyPlayerSlot.Add(emptySeat);
