@@ -15,7 +15,14 @@ public class TimeBomb : MonoBehaviour
     public GameObject playerCardSpawn;
     public GameObject playerHandSpawn;
     public GameObject[] rolesImage;
-    Dictionary<string, GameObject> serverObjects;
+    public Dictionary<string, GameObject> playersMap;
+    public GameObject playersContainer;
+
+
+    void Start()
+    {
+        playersMap = new Dictionary<string, GameObject>();
+    }
 
     public void startGame()
     {
@@ -39,6 +46,7 @@ public class TimeBomb : MonoBehaviour
         {
             GameObject newCard = Instantiate(cardPrefab, new Vector3(startHandPosition.x, startHandPosition.y, 2), Quaternion.identity);
             newCard.GetComponent<Selectable>().enabled = false;
+
             if (hand[i].Equals("bomb"))
             {
                 newCard.GetComponent<Card>().setCardType(CardTypeEnum.Bomb);
@@ -62,9 +70,9 @@ public class TimeBomb : MonoBehaviour
         }
     }
 
-    public void GenerateOtherPlayersHand(Dictionary<string, GameObject> players, int nbCard)
+    public void GenerateOtherPlayersHand(int nbCard)
     {
-        foreach (KeyValuePair<string, GameObject> player in players)
+        foreach (KeyValuePair<string, GameObject> player in playersMap)
         {
             Vector3 lastPosition = player.Value.transform.GetChild(0).gameObject.transform.position; // accede a CardSpawn du prefab...
 
@@ -78,20 +86,29 @@ public class TimeBomb : MonoBehaviour
         }
     }
 
-    public GameObject AddPlayer(string pseudo)
+    public void AddPlayer(string id, string pseudo)
     {
-        GameObject location = emptyPlayerSlot[0];
-        GameObject newPlayer = Instantiate(playerPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
-        Player player = newPlayer.GetComponent<Player>();
-        player.nameTextMesh.text = pseudo.Replace("\"", string.Empty);
 
-        emptyPlayerSlot.RemoveAt(0);
+        if (!playersMap.ContainsKey(id)) {			
+            GameObject location = emptyPlayerSlot[0];
+            GameObject newPlayer = Instantiate(playerPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
+            Player player = newPlayer.GetComponent<Player>();
+            player.nameTextMesh.text = pseudo.Replace("\"", string.Empty);
 
-        return gameObject;
+            emptyPlayerSlot.RemoveAt(0);
+            newPlayer.name = id;
+            newPlayer.transform.parent = playersContainer.transform;
+            playersMap.Add(id, newPlayer);
+        }
     }
 
-    public void RemovePlayer(Vector3 disconnectedPosition)
+    public void RemovePlayer(string id)
     {
+        GameObject go = playersMap[id];
+        Vector3 disconnectedPosition = playersMap[id].transform.position;
+        Destroy(go);
+        playersMap.Remove(id);
+
         GameObject emptySeat = Instantiate(emptySeatPrefab, disconnectedPosition, Quaternion.identity);
         emptyPlayerSlot.Add(emptySeat);
     }
@@ -105,12 +122,6 @@ public class TimeBomb : MonoBehaviour
         }
     }
     
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     // Update is called once per frame
     void Update()
     {

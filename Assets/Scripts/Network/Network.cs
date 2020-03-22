@@ -5,23 +5,18 @@ using SocketIO;
 public class Network : MonoBehaviour
 {
     SocketIOComponent socket;
-    Dictionary<string, GameObject> serverObjects;
 
     private TimeBomb timeBomb;
     private string pseudoForServer;
-
-    public GameObject playersContainer;
 
     public static string ClientID { get; private set; }
 
     void Start()
     {
-        serverObjects = new Dictionary<string, GameObject>();
         socket = GetComponent<SocketIOComponent>();
 
         // This line will set up the listener function
         socket.On("connectionEstabilished", onConnectionEstabilished);
-        socket.On("playerConnectionTest", ontt);
         socket.On("foreignMessage", onForeignMessage);
         socket.On("playerConnection", onPlayerConnection);
         socket.On("playerDisconnection", onPlayerDisconnection);
@@ -31,11 +26,6 @@ public class Network : MonoBehaviour
         socket.On("startGame", onStartGame);
 
         timeBomb = GameObject.Find("Game").GetComponent<TimeBomb>();
-    }
-
-    void ontt(SocketIOEvent evt)
-    {
-        Debug.Log("player connection test");
     }
 
     // This is the listener function definition
@@ -51,12 +41,7 @@ public class Network : MonoBehaviour
         string pseudo = evt.data["username"].ToString();
         Debug.Log("Player is connected: " + id);
 
-        if (!serverObjects.ContainsKey(id)) {			
-            GameObject go = timeBomb.AddPlayer(pseudo);
-            go.name = id;
-            go.transform.parent = playersContainer.transform;
-            serverObjects.Add(id, go);
-        }
+        timeBomb.AddPlayer(id, pseudo);
     }
 
     void onPlayerList(SocketIOEvent evt)
@@ -72,12 +57,9 @@ public class Network : MonoBehaviour
     {
         string id = evt.data["id"].ToString();
         Debug.Log("Player is disconnected: " + id);
-        GameObject go = serverObjects[id];
+        
 
-        timeBomb.RemovePlayer(go.transform.position);
-
-        Destroy(go);
-        serverObjects.Remove(id);
+        timeBomb.RemovePlayer(id);
     }
 
     void onForeignMessage(SocketIOEvent evt)
@@ -94,7 +76,7 @@ public class Network : MonoBehaviour
         List<string> hand = new List<string>(dataArray);
 
         timeBomb.GeneratePlayerHand(hand);
-        timeBomb.GenerateOtherPlayersHand(serverObjects, hand.Count);
+        timeBomb.GenerateOtherPlayersHand(hand.Count);
     }
 
     void onStartGame(SocketIOEvent evt)
