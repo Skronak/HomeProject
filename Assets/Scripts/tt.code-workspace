@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "G:\\LibgdxProjects\\TimeBombOnline"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.bjs": "javascript",
+			"*.javascript": "javascript"
+		},
+		"git.ignoreLimitWarning": true
+	}
+}

@@ -8,6 +8,7 @@ public class Network : MonoBehaviour
 
     private TimeBomb timeBomb;
     private string pseudoForServer;
+    public Message message;
 
     public static string ClientID { get; private set; }
 
@@ -32,7 +33,6 @@ public class Network : MonoBehaviour
     void onConnectionEstabilished(SocketIOEvent evt)
     {
         Debug.Log("You are connected: " + evt.data.GetField("id"));
-        //ClientID = evt.data["id"].ToString();
     }
 
     void onPlayerConnection(SocketIOEvent evt)
@@ -81,7 +81,6 @@ public class Network : MonoBehaviour
 
     void onStartGame(SocketIOEvent evt)
     {
-        Debug.Log("Game start: " + evt.data.GetField("id"));
         timeBomb.startGame();
     }
 

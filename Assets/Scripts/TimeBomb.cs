@@ -9,22 +9,30 @@ public class TimeBomb : MonoBehaviour
     public List<Card> deck = new List<Card>();
     public List<GameObject> emptyPlayerSlot;
     public List<Card> discoveredCards = new List<Card>();
-    public GameObject playerPrefab;
-    public GameObject cardPrefab;
+    public GameObject playerAvatarPrefab;
+    public GameObject playerHandCardPrefab;
     public GameObject emptySeatPrefab;
     public GameObject playerCardSpawn;
     public GameObject playerHandSpawn;
+    public GameObject[] playerHandCardsSpawn;
+    private List<GameObject> currentPlayerHandCards;
     public GameObject[] rolesImage;
     public Dictionary<string, GameObject> playerMap;
     public GameObject playersContainer;
-
+    public GameObject consoleGameobject;
+    private CustomConsole console;
+    
     void Start()
     {
+        currentPlayerHandCards = new List<GameObject>();
         playerMap = new Dictionary<string, GameObject>();
+        console = consoleGameobject.GetComponent<CustomConsole>();
     }
 
     public void startGame()
     {
+        console.sendMessageToConsole("system", "Game start");
+        cleanHand();
     }
 
     public void GenerateDeck(int turn)
@@ -36,14 +44,36 @@ public class TimeBomb : MonoBehaviour
     }
 
 
-    public void GeneratePlayerHand(List<string> hand)
+    public void GeneratePlayerHand(List<string> hand) {
+        for (int i = 0; i < hand.Count; i++)
+        {
+            Transform spawnToReplace = playerHandCardsSpawn[i].transform;
+            GameObject playerCard = Instantiate(playerHandCardPrefab, new Vector3(spawnToReplace.position.x, spawnToReplace.position.y, 2), spawnToReplace.rotation);
+            if (hand[i].Equals("bomb"))
+            {
+                playerCard.GetComponent<Card>().setCardType(CardTypeEnum.Bomb);
+            }
+            else if (hand[i].Equals("wire"))
+            {
+                playerCard.GetComponent<Card>().setCardType(CardTypeEnum.Wire);
+            }
+            else
+            {
+                playerCard.GetComponent<Card>().setCardType(CardTypeEnum.Empty);
+            }
+            playerCard.transform.parent = spawnToReplace;
+            currentPlayerHandCards.Add(playerCard);
+        }
+    }
+
+    public void GeneratePlayerHand2(List<string> hand)
     {
         Vector3 startHandPosition = playerHandSpawn.transform.position;
         Vector3 startPreviewPosition = playerCardSpawn.transform.position;
 
         for (int i = 0; i < hand.Count; i++)
         {
-            GameObject newCard = Instantiate(cardPrefab, new Vector3(startHandPosition.x, startHandPosition.y, 2), Quaternion.identity);
+            GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(startHandPosition.x, startHandPosition.y, 2), Quaternion.identity);
             newCard.GetComponent<Selectable>().enabled = false;
 
             if (hand[i].Equals("bomb"))
@@ -61,7 +91,7 @@ public class TimeBomb : MonoBehaviour
             startHandPosition.x -= 2;
 
             // simule cartes que les autres joueurs voient: TODO a melanger
-            GameObject cardPreview = Instantiate(cardPrefab, new Vector3(startPreviewPosition.x, startPreviewPosition.y, 3), Quaternion.identity);
+            GameObject cardPreview = Instantiate(playerHandCardPrefab, new Vector3(startPreviewPosition.x, startPreviewPosition.y, 3), Quaternion.identity);
             cardPreview.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
             cardPreview.GetComponent<Card>().isHidden = true;
             cardPreview.GetComponent<Selectable>().enabled = false;
@@ -77,7 +107,7 @@ public class TimeBomb : MonoBehaviour
 
             for (int i = 0; i < nbCard; i++)
             {
-                GameObject newCard = Instantiate(cardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
+                GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
                 newCard.GetComponent<Card>().isHidden = true;
                 lastPosition.x = lastPosition.x + 2; // magic number
                 newCard.GetComponent<Card>().playerId = player.Key;
@@ -90,7 +120,7 @@ public class TimeBomb : MonoBehaviour
 
         if (!playerMap.ContainsKey(id)) {			
             GameObject location = emptyPlayerSlot[0];
-            GameObject newPlayer = Instantiate(playerPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
+            GameObject newPlayer = Instantiate(playerAvatarPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
             Player player = newPlayer.GetComponent<Player>();
             player.nameTextMesh.text = pseudo.Replace("\"", string.Empty);
 
@@ -114,13 +144,23 @@ public class TimeBomb : MonoBehaviour
 
     public void showRole(string role) {
         if (role.Equals("\"moriarty\"")) {
-            (rolesImage[0]).active = false;
+            (rolesImage[0]).SetActive(false);
+            (rolesImage[1]).SetActive(true);
+            Camera.main.backgroundColor = Color.red;
         }
         else {
-            (rolesImage[1]).active = false;
+            (rolesImage[0]).SetActive(true);
+            (rolesImage[1]).SetActive(false);
+            Camera.main.backgroundColor = Color.blue;
         }
     }
     
+    public void cleanHand() {
+        for (int i = 0; i < currentPlayerHandCards.Count; ++i) {
+                Destroy(currentPlayerHandCards[i].gameObject);
+                currentPlayerHandCards.Remove(currentPlayerHandCards[i]);
+             }
+    }
     // Update is called once per frame
     void Update()
     {
