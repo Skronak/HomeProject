@@ -4,9 +4,6 @@ using UnityEngine;
 public class TimeBomb : MonoBehaviour
 {
 
-    public static string[] cards = new string[] { "1", "2", "3" };
-
-    public List<Card> deck = new List<Card>();
     public List<GameObject> emptyPlayerSlot;
     public List<Card> discoveredCards = new List<Card>();
     public GameObject playerAvatarPrefab;
@@ -32,7 +29,6 @@ public class TimeBomb : MonoBehaviour
     public void startGame()
     {
         console.sendMessageToConsole("system", "Game start");
-        cleanHand();
     }
 
     public void GenerateDeck(int turn)
@@ -45,6 +41,7 @@ public class TimeBomb : MonoBehaviour
 
 
     public void GeneratePlayerHand(List<string> hand) {
+        cleanHand();
         for (int i = 0; i < hand.Count; i++)
         {
             Transform spawnToReplace = playerHandCardsSpawn[i].transform;
@@ -158,8 +155,8 @@ public class TimeBomb : MonoBehaviour
     public void cleanHand() {
         for (int i = 0; i < currentPlayerHandCards.Count; ++i) {
                 Destroy(currentPlayerHandCards[i].gameObject);
-                currentPlayerHandCards.Remove(currentPlayerHandCards[i]);
              }
+            currentPlayerHandCards.Clear();
     }
     // Update is called once per frame
     void Update()
