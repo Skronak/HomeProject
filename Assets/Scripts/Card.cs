@@ -10,7 +10,7 @@ public Sprite cardBack;
 public string playerId;
 public bool isHidden;
 
-private CardTypeEnum cardType;
+private int cardType;
 private Sprite cardFront;
 private SpriteRenderer spriteRenderer;
 
@@ -28,21 +28,21 @@ private SpriteRenderer spriteRenderer;
         }
     }
 
-    public void setCardType(CardTypeEnum cardType) {
+    public void setCardType(int cardType) {
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
 
         switch (cardType)
         {
-          case CardTypeEnum.Bomb:
+          case 2:
               this.spriteRenderer.sprite = cardBomb;
               this.cardFront = cardBomb;
               break;
-         case CardTypeEnum.Empty:
+         case 1:
               this.spriteRenderer.sprite = cardEmpty;
               this.cardFront = cardEmpty;
               break;
-          case CardTypeEnum.Wire:
+          case 0:
               this.spriteRenderer.sprite = cardWire;
               this.cardFront = cardWire;
               break;

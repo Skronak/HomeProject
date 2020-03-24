@@ -8,7 +8,6 @@ public class Network : MonoBehaviour
 
     private TimeBomb timeBomb;
     private string pseudoForServer;
-    public Message message;
 
     public static string ClientID { get; private set; }
 
@@ -21,7 +20,8 @@ public class Network : MonoBehaviour
         socket.On("foreignMessage", onForeignMessage);
         socket.On("playerConnection", onPlayerConnection);
         socket.On("playerDisconnection", onPlayerDisconnection);
-        socket.On("newHand", onNewHandReceived);
+        socket.On("sendCard", onNewHandDistributed);
+        socket.On("otherCard", onOtherCardDistributed);
         socket.On("roleAssigment", onRoleAssignement);
         socket.On("userList", onPlayerList);
         socket.On("startGame", onStartGame);
@@ -58,7 +58,6 @@ public class Network : MonoBehaviour
         string id = evt.data["id"].ToString();
         Debug.Log("Player is disconnected: " + id);
         
-
         timeBomb.RemovePlayer(id);
     }
 
@@ -67,16 +66,20 @@ public class Network : MonoBehaviour
         Debug.Log(evt.data.GetField("message"));
     }
 
-    void onNewHandReceived(SocketIOEvent evt)
+    void onNewHandDistributed(SocketIOEvent evt)
     {
-        JSONObject data = evt.data.GetField("hand");
-        Debug.Log("new hand " + data);
+        string jsonString = evt.data.ToString();
+        PlayerCards playerCards = JsonUtility.FromJson<PlayerCards>(jsonString);
 
-        string[] dataArray = getJsonArray<string>(data.ToString());
-        List<string> hand = new List<string>(dataArray);
+        timeBomb.GeneratePlayerHand(playerCards);
+    }
 
-        timeBomb.GeneratePlayerHand(hand);
-        timeBomb.GenerateOtherPlayersHand(hand.Count);
+    void onOtherCardDistributed(SocketIOEvent evt)
+    {
+        string jsonString = evt.data.ToString();
+        PlayerCards playerCards = JsonUtility.FromJson<PlayerCards>(jsonString);
+
+//        timeBomb.GenerateOtherPlayersHand(hand.Count);
     }
 
     void onStartGame(SocketIOEvent evt)

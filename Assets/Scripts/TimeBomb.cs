@@ -40,26 +40,16 @@ public class TimeBomb : MonoBehaviour
     }
 
 
-    public void GeneratePlayerHand(List<string> hand) {
+    public void GeneratePlayerHand(PlayerCards playerCards) {
         cleanHand();
-        for (int i = 0; i < hand.Count; i++)
+        for (int i = 0; i < 5; i++)
         {
+            PlayerCard playerCard = playerCards.hand[i];
             Transform spawnToReplace = playerHandCardsSpawn[i].transform;
-            GameObject playerCard = Instantiate(playerHandCardPrefab, new Vector3(spawnToReplace.position.x, spawnToReplace.position.y, 2), spawnToReplace.rotation);
-            if (hand[i].Equals("bomb"))
-            {
-                playerCard.GetComponent<Card>().setCardType(CardTypeEnum.Bomb);
-            }
-            else if (hand[i].Equals("wire"))
-            {
-                playerCard.GetComponent<Card>().setCardType(CardTypeEnum.Wire);
-            }
-            else
-            {
-                playerCard.GetComponent<Card>().setCardType(CardTypeEnum.Empty);
-            }
-            playerCard.transform.parent = spawnToReplace;
-            currentPlayerHandCards.Add(playerCard);
+            GameObject playerCardGO = Instantiate(playerHandCardPrefab, new Vector3(spawnToReplace.position.x, spawnToReplace.position.y, 2), spawnToReplace.rotation);
+            playerCardGO.GetComponent<Card>().setCardType(playerCard.value);
+            playerCardGO.transform.parent = spawnToReplace;
+            currentPlayerHandCards.Add(playerCardGO);
         }
     }
 
@@ -68,32 +58,12 @@ public class TimeBomb : MonoBehaviour
         Vector3 startHandPosition = playerHandSpawn.transform.position;
         Vector3 startPreviewPosition = playerCardSpawn.transform.position;
 
-        for (int i = 0; i < hand.Count; i++)
-        {
-            GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(startHandPosition.x, startHandPosition.y, 2), Quaternion.identity);
-            newCard.GetComponent<Selectable>().enabled = false;
-
-            if (hand[i].Equals("bomb"))
-            {
-                newCard.GetComponent<Card>().setCardType(CardTypeEnum.Bomb);
-            }
-            else if (hand[i].Equals("wire"))
-            {
-                newCard.GetComponent<Card>().setCardType(CardTypeEnum.Wire);
-            }
-            else
-            {
-                newCard.GetComponent<Card>().setCardType(CardTypeEnum.Empty);
-            }
-            startHandPosition.x -= 2;
-
             // simule cartes que les autres joueurs voient: TODO a melanger
             GameObject cardPreview = Instantiate(playerHandCardPrefab, new Vector3(startPreviewPosition.x, startPreviewPosition.y, 3), Quaternion.identity);
             cardPreview.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
             cardPreview.GetComponent<Card>().isHidden = true;
             cardPreview.GetComponent<Selectable>().enabled = false;
             startPreviewPosition.x += 2;
-        }
     }
 
     public void GenerateOtherPlayersHand(int nbCard)
