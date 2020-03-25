@@ -69,17 +69,17 @@ public class Network : MonoBehaviour
     void onNewHandDistributed(SocketIOEvent evt)
     {
         string jsonString = evt.data.ToString();
-        PlayerCards playerCards = JsonUtility.FromJson<PlayerCards>(jsonString);
+        PlayerHand playerHand = JsonUtility.FromJson<PlayerHand>(jsonString);
 
-        timeBomb.GeneratePlayerHand(playerCards);
+        timeBomb.GeneratePlayerHand(playerHand);
     }
 
     void onOtherCardDistributed(SocketIOEvent evt)
     {
         string jsonString = evt.data.ToString();
-        PlayerCards playerCards = JsonUtility.FromJson<PlayerCards>(jsonString);
+        Card playerCards = JsonUtility.FromJson<Card>(jsonString);
 
-//        timeBomb.GenerateOtherPlayersHand(hand.Count);
+//        timeBomb.GenerateOtherPlayersHand(null);
     }
 
     void onStartGame(SocketIOEvent evt)

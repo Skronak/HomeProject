@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class PlayerCards
+public class PlayerHand
 {
     public PlayerCard [] hand;
 }

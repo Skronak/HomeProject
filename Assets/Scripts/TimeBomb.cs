@@ -40,11 +40,11 @@ public class TimeBomb : MonoBehaviour
     }
 
 
-    public void GeneratePlayerHand(PlayerCards playerCards) {
+    public void GeneratePlayerHand(PlayerHand playerHand) {
         cleanHand();
         for (int i = 0; i < 5; i++)
         {
-            PlayerCard playerCard = playerCards.hand[i];
+            PlayerCard playerCard = playerHand.hand[i];
             Transform spawnToReplace = playerHandCardsSpawn[i].transform;
             GameObject playerCardGO = Instantiate(playerHandCardPrefab, new Vector3(spawnToReplace.position.x, spawnToReplace.position.y, 2), spawnToReplace.rotation);
             playerCardGO.GetComponent<Card>().setCardType(playerCard.value);
