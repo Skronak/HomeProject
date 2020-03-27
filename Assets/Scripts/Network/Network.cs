@@ -77,7 +77,7 @@ public class Network : MonoBehaviour
     void onOtherCardDistributed(SocketIOEvent evt)
     {
         string jsonString = evt.data.ToString();
-        Card playerCards = JsonUtility.FromJson<Card>(jsonString);
+        OtherPlayerHand otherPlayerHand = JsonUtility.FromJson<OtherPlayerHand>(jsonString);
 
 //        timeBomb.GenerateOtherPlayersHand(null);
     }

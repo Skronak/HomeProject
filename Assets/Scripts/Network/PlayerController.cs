@@ -35,7 +35,9 @@ public class PlayerController : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.R)) 
 		{
-            socket.Emit("handRequest");
+			string jsonString = "{\"otherPlayerCard\":[{\"playerId\": \"GJ-nqwV4Y3VNx648AAAA\",\"cardId\":[1,2]}]}";
+			OtherPlayerHand otherPlayerHand = JsonUtility.FromJson<OtherPlayerHand>(jsonString);
+			Debug.Log(otherPlayerHand);
 		}
 
 
