@@ -3,5 +3,6 @@
 [System.Serializable]
 public class OtherPlayerHand
 {
-    public OtherPlayerCard [] otherPlayerCard;
+    public string playerId;
+    public int [] cardId;
 }

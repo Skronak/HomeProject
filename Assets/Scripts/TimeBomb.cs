@@ -66,20 +66,27 @@ public class TimeBomb : MonoBehaviour
             startPreviewPosition.x += 2;
     }
 
-    public void GenerateOtherPlayersHand(int nbCard)
+    public void GenerateOtherPlayersHand(OtherPlayerHands otherPlayerHands)
     {
-        foreach (KeyValuePair<string, GameObject> player in playerMap)
-        {
-            Vector3 lastPosition = player.Value.transform.GetChild(0).gameObject.transform.position; // accede a CardSpawn du prefab...
-
-            for (int i = 0; i < nbCard; i++)
+//        foreach (KeyValuePair<string, GameObject> player in playerMap)
+//        {
+   
+            for (int i = 0; i < otherPlayerHands.otherPlayerHand.Length; i++)
             {
-                GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
-                newCard.GetComponent<Card>().isHidden = true;
-                lastPosition.x = lastPosition.x + 2; // magic number
-                newCard.GetComponent<Card>().playerId = player.Key;
+                OtherPlayerHand otherPlayerHand = otherPlayerHands.otherPlayerHand[i];                
+                GameObject playerGO = playerMap[otherPlayerHand.playerId];
+
+                Vector3 lastPosition = playerGO.transform.GetChild(0).gameObject.transform.position; // accede a CardSpawn du prefab...
+                foreach (int cardId in otherPlayerHand.cardId) {
+
+                    GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
+                    newCard.GetComponent<Card>().isHidden = true;
+                    lastPosition.x = lastPosition.x + 2; // magic number
+                    newCard.GetComponent<Card>().playerId = otherPlayerHand.playerId;
+                    newCard.GetComponent<Card>().cardId = cardId;
+                }
             }
-        }
+ //       }
     }
 
     public void AddPlayer(string id, string pseudo)
@@ -89,7 +96,7 @@ public class TimeBomb : MonoBehaviour
             GameObject location = emptyPlayerSlot[0];
             GameObject newPlayer = Instantiate(playerAvatarPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
             Player player = newPlayer.GetComponent<Player>();
-            player.nameTextMesh.text = pseudo.Replace("\"", string.Empty);
+            player.nameTextMesh.text = pseudo;
 
             emptyPlayerSlot.RemoveAt(0);
             newPlayer.name = id;

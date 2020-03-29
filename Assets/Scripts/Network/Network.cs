@@ -37,8 +37,8 @@ public class Network : MonoBehaviour
 
     void onPlayerConnection(SocketIOEvent evt)
     {
-        string id = evt.data["id"].ToString();
-        string pseudo = evt.data["username"].ToString();
+        string id = evt.data["id"].ToString().Replace("\"", string.Empty);
+        string pseudo = evt.data["username"].ToString().Replace("\"", string.Empty);
         Debug.Log("Player is connected: " + id);
 
         timeBomb.AddPlayer(id, pseudo);
@@ -77,9 +77,8 @@ public class Network : MonoBehaviour
     void onOtherCardDistributed(SocketIOEvent evt)
     {
         string jsonString = evt.data.ToString();
-        OtherPlayerHand otherPlayerHand = JsonUtility.FromJson<OtherPlayerHand>(jsonString);
-
-//        timeBomb.GenerateOtherPlayersHand(null);
+        OtherPlayerHands otherPlayerHands = JsonUtility.FromJson<OtherPlayerHands>(jsonString);
+        timeBomb.GenerateOtherPlayersHand(otherPlayerHands);
     }
 
     void onStartGame(SocketIOEvent evt)
