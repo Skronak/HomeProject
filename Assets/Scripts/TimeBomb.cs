@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using SocketIO;
 
 public class TimeBomb : MonoBehaviour
 {
@@ -9,26 +10,36 @@ public class TimeBomb : MonoBehaviour
     public GameObject playerAvatarPrefab;
     public GameObject playerHandCardPrefab;
     public GameObject emptySeatPrefab;
-    public GameObject playerCardSpawn;
-    public GameObject playerHandSpawn;
+    public GameObject playerPreviewHandSpawn;
     public GameObject[] playerHandCardsSpawn;
-    private List<GameObject> currentPlayerHandCards;
+    private List<GameObject> currentPlayerHandCards; // TODO useless?
+    private Dictionary<string, GameObject> currentCardsInGame;
     public GameObject[] rolesImage;
     public Dictionary<string, GameObject> playerMap;
     public GameObject playersContainer;
     public GameObject consoleGameobject;
+    public GameObject socketIOGO;
     private CustomConsole console;
-    
+    private SocketIOComponent socketIoComponent;
+    private GameObject currentHoverObject;
+
     void Start()
     {
-        currentPlayerHandCards = new List<GameObject>();
-        playerMap = new Dictionary<string, GameObject>();
         console = consoleGameobject.GetComponent<CustomConsole>();
+        socketIoComponent = socketIOGO.GetComponent<SocketIOComponent>();
+        currentPlayerHandCards = new List<GameObject>();
+        currentCardsInGame = new Dictionary<string, GameObject>();
+        playerMap = new Dictionary<string, GameObject>();
     }
 
     public void startGame()
     {
         console.sendMessageToConsole("system", "Game start");
+
+        currentPlayerHandCards = new List<GameObject>();
+        currentCardsInGame = new Dictionary<string, GameObject>();
+        playerMap = new Dictionary<string, GameObject>();
+
     }
 
     public void GenerateDeck(int turn)
@@ -39,54 +50,50 @@ public class TimeBomb : MonoBehaviour
     {
     }
 
-
     public void GeneratePlayerHand(PlayerHand playerHand) {
-        cleanHand();
+        cleanHand(); // TODO dans new tour
+
+        Vector3 lastPosition = playerPreviewHandSpawn.transform.position;
         for (int i = 0; i < 5; i++)
         {
             PlayerCard playerCard = playerHand.hand[i];
+
             Transform spawnToReplace = playerHandCardsSpawn[i].transform;
             GameObject playerCardGO = Instantiate(playerHandCardPrefab, new Vector3(spawnToReplace.position.x, spawnToReplace.position.y, 2), spawnToReplace.rotation);
             playerCardGO.GetComponent<Card>().setCardType(playerCard.value);
             playerCardGO.transform.parent = spawnToReplace;
             currentPlayerHandCards.Add(playerCardGO);
+
+            GameObject previewPlayerCardGO = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
+            previewPlayerCardGO.GetComponent<Card>().isHidden = true;
+            lastPosition.x = lastPosition.x + 2; // magic number
+            previewPlayerCardGO.GetComponent<Card>().playerId = playerCard.player;
+            previewPlayerCardGO.GetComponent<Card>().cardId = playerCard.id;
+            previewPlayerCardGO.AddComponent<Selectable>().socket = socketIoComponent;
+            currentCardsInGame.Add(playerCard.id, previewPlayerCardGO);
         }
-    }
-
-    public void GeneratePlayerHand2(List<string> hand)
-    {
-        Vector3 startHandPosition = playerHandSpawn.transform.position;
-        Vector3 startPreviewPosition = playerCardSpawn.transform.position;
-
-            // simule cartes que les autres joueurs voient: TODO a melanger
-            GameObject cardPreview = Instantiate(playerHandCardPrefab, new Vector3(startPreviewPosition.x, startPreviewPosition.y, 3), Quaternion.identity);
-            cardPreview.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-            cardPreview.GetComponent<Card>().isHidden = true;
-            cardPreview.GetComponent<Selectable>().enabled = false;
-            startPreviewPosition.x += 2;
     }
 
     public void GenerateOtherPlayersHand(OtherPlayerHands otherPlayerHands)
     {
-//        foreach (KeyValuePair<string, GameObject> player in playerMap)
-//        {
-   
-            for (int i = 0; i < otherPlayerHands.otherPlayerHand.Length; i++)
-            {
-                OtherPlayerHand otherPlayerHand = otherPlayerHands.otherPlayerHand[i];                
-                GameObject playerGO = playerMap[otherPlayerHand.playerId];
+        for (int i = 0; i < otherPlayerHands.otherPlayerHand.Length; i++)
+        {   
+            Shuffle(otherPlayerHands.otherPlayerHand);            
+            OtherPlayerHand otherPlayerHand = otherPlayerHands.otherPlayerHand[i];
+           
+            GameObject playerGO = playerMap[otherPlayerHand.playerId];
 
-                Vector3 lastPosition = playerGO.transform.GetChild(0).gameObject.transform.position; // accede a CardSpawn du prefab...
-                foreach (int cardId in otherPlayerHand.cardId) {
-
-                    GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
-                    newCard.GetComponent<Card>().isHidden = true;
-                    lastPosition.x = lastPosition.x + 2; // magic number
-                    newCard.GetComponent<Card>().playerId = otherPlayerHand.playerId;
-                    newCard.GetComponent<Card>().cardId = cardId;
-                }
+            Vector3 lastPosition = playerGO.transform.GetChild(0).gameObject.transform.position; // accede a CardSpawn du prefab...
+            foreach (int cardId in otherPlayerHand.cardId) {
+                GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
+                newCard.GetComponent<Card>().isHidden = true;
+                lastPosition.x = lastPosition.x + 2; // magic number
+                newCard.GetComponent<Card>().playerId = otherPlayerHand.playerId;
+                newCard.GetComponent<Card>().cardId = cardId.ToString();
+                newCard.AddComponent<Selectable>().socket = socketIoComponent;
+                currentCardsInGame.Add(cardId.ToString(), newCard); // TODO moche de cast tostring
             }
- //       }
+        }
     }
 
     public void AddPlayer(string id, string pseudo)
@@ -117,7 +124,7 @@ public class TimeBomb : MonoBehaviour
     }
 
     public void showRole(string role) {
-        if (role.Equals("\"moriarty\"")) {
+        if (role.Equals("1")) {
             (rolesImage[0]).SetActive(false);
             (rolesImage[1]).SetActive(true);
             Camera.main.backgroundColor = Color.red;
@@ -132,12 +139,34 @@ public class TimeBomb : MonoBehaviour
     public void cleanHand() {
         for (int i = 0; i < currentPlayerHandCards.Count; ++i) {
                 Destroy(currentPlayerHandCards[i].gameObject);
-             }
-            currentPlayerHandCards.Clear();
-    }
-    // Update is called once per frame
-    void Update()
-    {
+        }
+        currentPlayerHandCards.Clear();
 
+        foreach(KeyValuePair<string, GameObject> cardGameObject in currentCardsInGame) {
+            Destroy(cardGameObject.Value);
+        }
+        currentCardsInGame.Clear();
+    }
+
+    public void HoverCard(string cardId) {
+        if (currentHoverObject!= null) {
+            currentHoverObject.GetComponent<Selectable>().RemoveCardHoverEffect();
+        }
+        currentHoverObject = currentCardsInGame[cardId];
+        currentCardsInGame[cardId].GetComponent<Selectable>().AddCardHoverEffect();
+    }
+
+    private void Shuffle<T>(T[] list)
+    {
+        System.Random random = new System.Random();
+        int n = list.Length;
+        while (n > 1)
+        {
+            int k = random.Next(n);
+            n--;
+            T temp = list[k];
+            list[k] = list[n];
+            list[n] = temp;
+        }
     }
 }

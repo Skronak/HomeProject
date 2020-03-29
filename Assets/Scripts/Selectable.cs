@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using SocketIO;
 
 public class Selectable : MonoBehaviour
 {
     public bool isSelected;
     public Card card;
+   	public SocketIOComponent socket;
 
     // Start is called before the first frame update
     void Start()
@@ -19,15 +19,23 @@ public class Selectable : MonoBehaviour
     }
 
     void OnMouseDown() {
-        GetComponent<Card>().isHidden=!card.isHidden;
-;
+        socket.Emit("revealCard", JSONObject.CreateStringObject(card.cardId.ToString()));
     }
 
-    void OnMouseOver() {
-        GetComponent<SpriteRenderer>().color = Color.yellow;
+    void OnMouseEnter() {
+        AddCardHoverEffect();
+        socket.Emit("cardHover", JSONObject.CreateStringObject(card.cardId.ToString()));
     }
 
     void OnMouseExit () {
+        RemoveCardHoverEffect();
+    }
+
+    public void AddCardHoverEffect() {
+        GetComponent<SpriteRenderer>().color = Color.yellow;
+    }
+
+    public void RemoveCardHoverEffect() {
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 }

@@ -8,7 +8,7 @@ public Sprite cardEmpty;
 public Sprite cardBomb;
 public Sprite cardBack;
 public string playerId;
-public int cardId;
+public string cardId;
 public bool isHidden;
 
 private int cardType;

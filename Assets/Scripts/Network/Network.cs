@@ -25,6 +25,8 @@ public class Network : MonoBehaviour
         socket.On("roleAssigment", onRoleAssignement);
         socket.On("userList", onPlayerList);
         socket.On("startGame", onStartGame);
+        socket.On("cardHover", onCardHover);
+        socket.On("revealCard", onCardReveal);
 
         timeBomb = GameObject.Find("Game").GetComponent<TimeBomb>();
     }
@@ -107,6 +109,16 @@ public class Network : MonoBehaviour
         }
 
         socket.Emit("register", JSONObject.CreateStringObject(pseudoForServer));
+    }
+
+    public void onCardHover(SocketIOEvent evt) {
+        string cardId = evt.data.GetField("hover").ToString().Replace("\"", string.Empty);
+        timeBomb.HoverCard(cardId);
+    }
+
+    public void onCardReveal(SocketIOEvent evt) {
+        string cardId = evt.data.GetField("hover").ToString().Replace("\"", string.Empty);
+        timeBomb.HoverCard(cardId);
     }
 
     public void setPseudoForServer(string pseudo) {
