@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5881457745319251955
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5881457745319251953}
+  - component: {fileID: 5881457745319251952}
+  - component: {fileID: 5881457745319251966}
+  m_Layer: 0
+  m_Name: Game
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5881457745319251953
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5881457745319251955}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.1302539, y: -1.072557, z: -4.0654297}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5881457745319251952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5881457745319251955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cf22f5523c78ad41b3f9871e8e11075, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emptyPlayerSlot:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  discoveredCards: []
+  playerAvatarPrefab: {fileID: 4246905625984649000, guid: 8e634e3c24e3b8b47b2cb7bd8c6b0613,
+    type: 3}
+  playerHandCardPrefab: {fileID: 6772320768669033085, guid: 210b9c859dd207840a0d19dbc9a08983,
+    type: 3}
+  emptySeatPrefab: {fileID: 5754883706073447338, guid: 67e0a48dcd880c148af99dca371c052c,
+    type: 3}
+  playerPreviewHandSpawn: {fileID: 0}
+  playerHandCardsSpawn:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  rolesImage:
+  - {fileID: 0}
+  - {fileID: 0}
+  playersContainer: {fileID: 0}
+  consoleGameobject: {fileID: 0}
+  socketIOGO: {fileID: 0}
+--- !u!114 &5881457745319251966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5881457745319251955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f3c2f48c744ab3469a849ab7559f46e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

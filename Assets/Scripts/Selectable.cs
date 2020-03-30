@@ -5,7 +5,8 @@ public class Selectable : MonoBehaviour
 {
     public bool isSelected;
     public Card card;
-   	public SocketIOComponent socket;
+    public SocketIOComponent socket;
+    public bool isPlayerCard;
 
     // Start is called before the first frame update
     void Start()
@@ -18,24 +19,35 @@ public class Selectable : MonoBehaviour
     {
     }
 
-    void OnMouseDown() {
-        socket.Emit("revealCard", JSONObject.CreateStringObject(card.cardId.ToString()));
+    void OnMouseDown()
+    {
+        if (!isPlayerCard)
+        {
+            socket.Emit("revealCard", JSONObject.CreateStringObject(card.cardId.ToString()));
+        }
     }
 
-    void OnMouseEnter() {
+    void OnMouseEnter()
+    {
         AddCardHoverEffect();
-        socket.Emit("cardHover", JSONObject.CreateStringObject(card.cardId.ToString()));
+        if (!isPlayerCard)
+        {
+            socket.Emit("cardHover", JSONObject.CreateStringObject(card.cardId.ToString()));
+        }
     }
 
-    void OnMouseExit () {
+    void OnMouseExit()
+    {
         RemoveCardHoverEffect();
     }
 
-    public void AddCardHoverEffect() {
+    public void AddCardHoverEffect()
+    {
         GetComponent<SpriteRenderer>().color = Color.yellow;
     }
 
-    public void RemoveCardHoverEffect() {
+    public void RemoveCardHoverEffect()
+    {
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 }

@@ -117,8 +117,9 @@ public class Network : MonoBehaviour
     }
 
     public void onCardReveal(SocketIOEvent evt) {
-        string cardId = evt.data.GetField("hover").ToString().Replace("\"", string.Empty);
-        timeBomb.HoverCard(cardId);
+        string jsonString = evt.data.ToString();
+		PlayerCard playerCard = JsonUtility.FromJson<PlayerCard>(jsonString);
+        timeBomb.RevealCard(playerCard);
     }
 
     public void setPseudoForServer(string pseudo) {

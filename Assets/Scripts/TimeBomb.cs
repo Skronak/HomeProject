@@ -9,6 +9,7 @@ public class TimeBomb : MonoBehaviour
     public List<Card> discoveredCards = new List<Card>();
     public GameObject playerAvatarPrefab;
     public GameObject playerHandCardPrefab;
+    public GameObject cardPrefab;
     public GameObject emptySeatPrefab;
     public GameObject playerPreviewHandSpawn;
     public GameObject[] playerHandCardsSpawn;
@@ -42,14 +43,6 @@ public class TimeBomb : MonoBehaviour
 
     }
 
-    public void GenerateDeck(int turn)
-    {
-    }
-
-    public void topCard()
-    {
-    }
-
     public void GeneratePlayerHand(PlayerHand playerHand) {
         cleanHand(); // TODO dans new tour
 
@@ -70,6 +63,7 @@ public class TimeBomb : MonoBehaviour
             previewPlayerCardGO.GetComponent<Card>().playerId = playerCard.player;
             previewPlayerCardGO.GetComponent<Card>().cardId = playerCard.id;
             previewPlayerCardGO.AddComponent<Selectable>().socket = socketIoComponent;
+            previewPlayerCardGO.GetComponent<Selectable>().isPlayerCard = true;
             currentCardsInGame.Add(playerCard.id, previewPlayerCardGO);
         }
     }
@@ -156,6 +150,14 @@ public class TimeBomb : MonoBehaviour
         currentCardsInGame[cardId].GetComponent<Selectable>().AddCardHoverEffect();
     }
 
+    public void RevealCard(PlayerCard playerCard) {
+        currentHoverObject = currentCardsInGame[playerCard.id];
+        GameObject cardRevealedGO = Instantiate(cardPrefab, new Vector3(currentHoverObject.transform.position.x, currentHoverObject.transform.position.y, 2), Quaternion.identity);
+        cardRevealedGO.transform.localScale = currentHoverObject.transform.localScale;
+        cardRevealedGO.GetComponent<Card>().setCardType(playerCard.value);
+        currentHoverObject.AddComponent<Dissolve>();
+    }
+    
     private void Shuffle<T>(T[] list)
     {
         System.Random random = new System.Random();

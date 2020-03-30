@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Dissolve : MonoBehaviour
 {
@@ -12,20 +10,18 @@ public class Dissolve : MonoBehaviour
     void Start()
     {
         material = GetComponent<SpriteRenderer>().material;
+        isDissolving = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            isDissolving=true;
-        }
-
         if (isDissolving) {
             fade -=(Time.deltaTime/1.5f);
             if(fade <= 0f) {
                 fade = 0f;
                 isDissolving = false;
+                Destroy(gameObject);
             }
             material.SetFloat("_Fade", fade);
         }

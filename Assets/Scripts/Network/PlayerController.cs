@@ -14,11 +14,6 @@ public class PlayerController : MonoBehaviour
 	
 	void Update () 
 	{
-		// demande au serveur de logger les utilisateurs dans la partie
-		if (Input.GetKeyDown(KeyCode.A)) 
-		{
-		}
-
 		if (Input.GetKeyDown(KeyCode.Space)){
 			socket.Emit("register", JSONObject.CreateStringObject("debug"));
 		}
@@ -29,14 +24,13 @@ public class PlayerController : MonoBehaviour
 			socket.Emit("startGame");
 		}
 
-		if (Input.GetKeyDown(KeyCode.E)) {
-		}
-
 		if (Input.GetKeyDown(KeyCode.R)) 
 		{
-			string jsonString = "{\"otherPlayerHand\":[{\"playerId\":\"F2cz5kl13BksPJ40AAAA\",\"cardId\":[11,13,0,12,3]},{\"playerId\":\"yEChzy01pZO48QkdAAAB\",\"cardId\":[14,6,9,4,5]}]}";
-			OtherPlayerHands otherPlayerHands = JsonUtility.FromJson<OtherPlayerHands>(jsonString);
-			Debug.Log(otherPlayerHands);
+//			string jsonString = "{\"otherPlayerHand\":[{\"playerId\":\"F2cz5kl13BksPJ40AAAA\",\"cardId\":[11,13,0,12,3]},{\"playerId\":\"yEChzy01pZO48QkdAAAB\",\"cardId\":[14,6,9,4,5]}]}";
+//			OtherPlayerHands otherPlayerHands = JsonUtility.FromJson<OtherPlayerHands>(jsonString);
+//			string jsonString = "{\"id\":\"6\",\"value\":1,\"player\":\"lO9P41X728aly81YAAAC\"}";
+//			PlayerCard playerCard = JsonUtility.FromJson<PlayerCard>(jsonString);
+//			Debug.Log(playerCard);
 		}
 	}
 }
