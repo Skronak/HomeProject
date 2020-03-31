@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class test : MonoBehaviour
+public class ScaleAction : MonoBehaviour
 {
     // Start is called before the first frame update
     void StartAnimation()
