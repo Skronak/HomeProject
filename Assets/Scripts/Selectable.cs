@@ -29,9 +29,9 @@ public class Selectable : MonoBehaviour
 
     void OnMouseEnter()
     {
-        AddCardHoverEffect();
         if (!isPlayerCard)
         {
+            AddCardHoverEffect();
             socket.Emit("cardHover", JSONObject.CreateStringObject(card.cardId.ToString()));
         }
     }

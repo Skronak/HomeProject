@@ -41,7 +41,7 @@ Material:
     - _EnableExternalAlpha: 0
     - _Fade: 1
     m_Colors:
-    - Color_DA0495A8: {r: 5.091748, g: 0.37256697, b: 0, a: 0}
+    - Color_DA0495A8: {r: 5.0917487, g: 1.7080686, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}

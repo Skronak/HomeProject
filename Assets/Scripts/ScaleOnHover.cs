@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 // Card spawn in player hand
-public class PlayerHandCard : MonoBehaviour
+public class ScaleOnHover : MonoBehaviour
 {
     private Vector3 onOverPosition;
     private Vector3 originalPosition;
