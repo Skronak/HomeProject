@@ -26,6 +26,7 @@ public class TimeBomb : MonoBehaviour
     private SocketIOComponent socketIoComponent;
     private GameObject currentHoverObject;
     private List<GameObject> currentCardRevealed;
+    public GameObject token;
 
     void Start()
     {
@@ -44,6 +45,7 @@ public class TimeBomb : MonoBehaviour
         currentPlayerHandCards = new List<GameObject>();
         currentCardsInGame = new Dictionary<string, GameObject>();
         playerMap = new Dictionary<string, GameObject>();
+
 
         initNewTurn();
     }
@@ -168,11 +170,24 @@ public class TimeBomb : MonoBehaviour
         cardRevealedGO.transform.localScale = currentHoverObject.transform.localScale;
         cardRevealedGO.GetComponent<Card>().setCardType(playerCard.value);
         currentHoverObject.AddComponent<Dissolve>();
-
+        currentHoverObject.GetComponent<ScaleOnHover>().enabled = false;
+        cardRevealedGO.transform.parent = revealedCardSpawn[currentCardRevealed.Count].transform;
         currentCardRevealed.Add(cardRevealedGO);
+
         LeanTween.moveLocal(cardRevealedGO, revealedCardSpawn[currentCardRevealed.Count].transform.position, 0.5f).setDelay(2f);
     }
   
+    public void showToken(bool isSelf, string playerId) {
+        if(isSelf) {
+            token.transform.position = Vector3.zero;
+            token.transform.localScale = Vector3.zero;
+
+            LeanTween.scale(gameObject, new Vector3(2,2,0), 1f);
+            LeanTween.moveLocal(gameObject, new Vector3(-62,-81,0),1).setDelay(1);
+            LeanTween.scale(gameObject, new Vector3(1,1,0),1f).setDelay(1f);
+        }
+    }
+
     public void initNewTurn() {
         cleanBoard();
     }

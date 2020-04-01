@@ -8,6 +8,7 @@ public class Network : MonoBehaviour
 
     private TimeBomb timeBomb;
     private string pseudoForServer;
+    public string idForServer;
 
     public static string ClientID { get; private set; }
 
@@ -27,6 +28,7 @@ public class Network : MonoBehaviour
         socket.On("startGame", onStartGame);
         socket.On("cardHover", onCardHover);
         socket.On("revealCard", onCardReveal);
+        socket.On("token", onTokenDistributed);
 
         timeBomb = GameObject.Find("Game").GetComponent<TimeBomb>();
     }
@@ -35,12 +37,13 @@ public class Network : MonoBehaviour
     void onConnectionEstabilished(SocketIOEvent evt)
     {
         Debug.Log("You are connected: " + evt.data.GetField("id"));
+        idForServer = evt.data.GetField("id").ToString();
     }
 
     void onPlayerConnection(SocketIOEvent evt)
     {
-        string id = evt.data["id"].ToString().Replace("\"", string.Empty);
-        string pseudo = evt.data["username"].ToString().Replace("\"", string.Empty);
+        string id = evt.data["id"].str;
+        string pseudo = evt.data["username"].str;
         Debug.Log("Player is connected: " + id);
 
         timeBomb.AddPlayer(id, pseudo);
@@ -112,7 +115,7 @@ public class Network : MonoBehaviour
     }
 
     public void onCardHover(SocketIOEvent evt) {
-        string cardId = evt.data.GetField("hover").ToString().Replace("\"", string.Empty);
+        string cardId = evt.data.GetField("hover").str;
         timeBomb.HoverCard(cardId);
     }
 
@@ -120,6 +123,12 @@ public class Network : MonoBehaviour
         string jsonString = evt.data.ToString();
 		PlayerCard playerCard = JsonUtility.FromJson<PlayerCard>(jsonString);
         timeBomb.RevealCard(playerCard);
+    }
+
+    public void onTokenDistributed(SocketIOEvent evt) {
+        string playerId = evt.data.GetField("token").str;
+        bool isSelf = playerId.CompareTo(idForServer) == 0;
+        timeBomb.showToken(isSelf, playerId);
     }
 
     public void setPseudoForServer(string pseudo) {
