@@ -16,6 +16,7 @@ public class TimeBomb : MonoBehaviour
     private GameObject playerPreviewHandSpawn;
     public GameObject[] playerHandCardsSpawn;
     private List<GameObject> currentPlayerHandCards; // TODO useless?
+    private List<GameObject> currentCardRevealedThisTurn;
     private Dictionary<string, GameObject> currentCardsInGame;
     public GameObject[] rolesImage;
     public Dictionary<string, GameObject> playerMap;
@@ -27,6 +28,7 @@ public class TimeBomb : MonoBehaviour
     private GameObject currentHoverObject;
     private List<GameObject> currentCardRevealed;
     public GameObject token;
+    private GameObject currentPlayerWithToken;
 
     void Start()
     {
@@ -34,6 +36,7 @@ public class TimeBomb : MonoBehaviour
         socketIoComponent = socketIOGO.GetComponent<SocketIOComponent>();
         currentPlayerHandCards = new List<GameObject>();
         currentCardRevealed = new List<GameObject>();
+        currentCardRevealedThisTurn = new List<GameObject>();
         currentCardsInGame = new Dictionary<string, GameObject>();
         playerMap = new Dictionary<string, GameObject>();
     }
@@ -149,10 +152,12 @@ public class TimeBomb : MonoBehaviour
         }
         currentCardsInGame.Clear();
 
-        for (int i = 0; i < currentCardRevealed.Count; ++i) {
-                Destroy(currentCardRevealed[i].gameObject);
+        for (int i = 0; i < currentCardRevealedThisTurn.Count; ++i) {
+                currentCardRevealed.Add(currentCardRevealedThisTurn[i].gameObject);
+                currentCardRevealedThisTurn[i].SetActive(false);
+                //Destroy(currentCardRevealed[i].gameObject);
         }
-        currentCardRevealed.Clear();
+        currentCardRevealedThisTurn.Clear();
     }
 
     public void HoverCard(string cardId) {
@@ -170,10 +175,10 @@ public class TimeBomb : MonoBehaviour
         cardRevealedGO.GetComponent<Card>().setCardType(playerCard.value);
         currentHoverObject.AddComponent<Dissolve>();
         currentHoverObject.GetComponent<ScaleOnHover>().enabled = false;
-        cardRevealedGO.transform.parent = revealedCardSpawn[currentCardRevealed.Count].transform;
-        currentCardRevealed.Add(cardRevealedGO);
+        cardRevealedGO.transform.parent = revealedCardSpawn[currentCardRevealedThisTurn.Count].transform;
+        currentCardRevealedThisTurn.Add(cardRevealedGO);
 
-        LeanTween.moveLocal(cardRevealedGO, revealedCardSpawn[currentCardRevealed.Count].transform.position, 0.5f).setDelay(2f);
+        LeanTween.moveLocal(cardRevealedGO, revealedCardSpawn[currentCardRevealedThisTurn.Count].transform.position, 0.5f).setDelay(2f);
     }
   
     public void showToken(bool isSelf, string playerId) {
@@ -185,8 +190,14 @@ public class TimeBomb : MonoBehaviour
             LeanTween.scale(gameObject, new Vector3(2,2,0), 1f);
             LeanTween.moveLocal(gameObject, new Vector3(-62,-81,0),1).setDelay(1);
             LeanTween.scale(gameObject, new Vector3(1,1,0),1f).setDelay(1f);
+
+            if (currentPlayerWithToken!=null) {
+                currentPlayerWithToken.GetComponent<Player>().token.enabled = false;
+            }
         } else {
             token.SetActive(false);
+            playerMap[playerId].GetComponent<Player>().token.enabled = true;
+            currentPlayerWithToken = playerMap[playerId];
         }
     }
 

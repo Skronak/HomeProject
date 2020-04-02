@@ -24,7 +24,6 @@ public class Network : MonoBehaviour
         socket.On("sendCard", onNewHandDistributed);
         socket.On("otherCard", onOtherCardDistributed);
         socket.On("roleAssigment", onRoleAssignement);
-        socket.On("userList", onPlayerList);
         socket.On("startGame", onStartGame);
         socket.On("cardHover", onCardHover);
         socket.On("revealCard", onCardReveal);
@@ -47,15 +46,6 @@ public class Network : MonoBehaviour
         Debug.Log("Player is connected: " + id);
 
         timeBomb.AddPlayer(id, pseudo);
-    }
-
-    void onPlayerList(SocketIOEvent evt)
-    {
-        Debug.Log("Players in session: " + evt.data.GetField("userList").ToString());
-        string data = evt.data.ToString();
-        UserList playerList = new UserList();
-        playerList = JsonUtility.FromJson<UserList>(data);
-        Player[] dataArray = getJsonArray<Player>(data);
     }
 
     void onPlayerDisconnection(SocketIOEvent evt)
@@ -99,13 +89,6 @@ public class Network : MonoBehaviour
         timeBomb.showRole(role);
     }
 
-    public static T[] getJsonArray<T>(string json)
-    {
-        string newJson = "{ \"array\": " + json + "}";
-        Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
-        return wrapper.array;
-    }
-
     public void joinGame() {
         if (pseudoForServer == null) {
             pseudoForServer = "noname";
@@ -135,22 +118,4 @@ public class Network : MonoBehaviour
         pseudoForServer = pseudo;
     }
 
-    [System.Serializable]
-    private class Wrapper<T>
-    {
-        public T[] array;
-    }
-
-    [System.Serializable]
-    public class Player
-    {
-        public string id { get; set; }
-        public string playerName { get; set; }
-    }
-
-    [System.Serializable]
-    public class UserList
-    {
-        public List<Player> userList;
-    }
 }
