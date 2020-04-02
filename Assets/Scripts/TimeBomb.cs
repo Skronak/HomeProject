@@ -45,14 +45,13 @@ public class TimeBomb : MonoBehaviour
         currentPlayerHandCards = new List<GameObject>();
         currentCardsInGame = new Dictionary<string, GameObject>();
         playerMap = new Dictionary<string, GameObject>();
-
-
-        initNewTurn();
     }
 
     public void GeneratePlayerHand(PlayerHand playerHand) {
+        initNewTurn();
+
         Vector3 lastPosition = playerPreviewHandSpawn.transform.position;         
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < playerHand.hand.Length; i++)
         {
             PlayerCard playerCard = playerHand.hand[i];
 
@@ -179,17 +178,21 @@ public class TimeBomb : MonoBehaviour
   
     public void showToken(bool isSelf, string playerId) {
         if(isSelf) {
+            token.SetActive(true);
             token.transform.position = Vector3.zero;
             token.transform.localScale = Vector3.zero;
 
             LeanTween.scale(gameObject, new Vector3(2,2,0), 1f);
             LeanTween.moveLocal(gameObject, new Vector3(-62,-81,0),1).setDelay(1);
             LeanTween.scale(gameObject, new Vector3(1,1,0),1f).setDelay(1f);
+        } else {
+            token.SetActive(false);
         }
     }
 
     public void initNewTurn() {
         cleanBoard();
+        token.SetActive(false);
     }
 
     private void Shuffle<T>(T[] list)

@@ -37,7 +37,7 @@ public class Network : MonoBehaviour
     void onConnectionEstabilished(SocketIOEvent evt)
     {
         Debug.Log("You are connected: " + evt.data.GetField("id"));
-        idForServer = evt.data.GetField("id").ToString();
+        idForServer = evt.data.GetField("id").str;
     }
 
     void onPlayerConnection(SocketIOEvent evt)
@@ -60,7 +60,7 @@ public class Network : MonoBehaviour
 
     void onPlayerDisconnection(SocketIOEvent evt)
     {
-        string id = evt.data["id"].ToString();
+        string id = evt.data["id"].str;
         Debug.Log("Player is disconnected: " + id);
         
         timeBomb.RemovePlayer(id);
