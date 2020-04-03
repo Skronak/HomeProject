@@ -21,7 +21,7 @@ public class Selectable : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (!isPlayerCard)
+        if (TimeBomb.IsInputEnabled && !isPlayerCard)
         {
             socket.Emit("revealCard", JSONObject.CreateStringObject(card.cardId.ToString()));
         }
@@ -29,7 +29,7 @@ public class Selectable : MonoBehaviour
 
     void OnMouseEnter()
     {
-        if (!isPlayerCard)
+        if (TimeBomb.IsInputEnabled & !isPlayerCard)
         {
             AddCardHoverEffect();
             socket.Emit("cardHover", JSONObject.CreateStringObject(card.cardId.ToString()));
@@ -38,7 +38,10 @@ public class Selectable : MonoBehaviour
 
     void OnMouseExit()
     {
-        RemoveCardHoverEffect();
+        if (TimeBomb.IsInputEnabled)
+        {
+            RemoveCardHoverEffect();
+        }
     }
 
     public void AddCardHoverEffect()

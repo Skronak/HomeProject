@@ -28,6 +28,7 @@ public class Network : MonoBehaviour
         socket.On("cardHover", onCardHover);
         socket.On("revealCard", onCardReveal);
         socket.On("token", onTokenDistributed);
+        socket.On("newTour", onNewTurn);
 
         timeBomb = GameObject.Find("Game").GetComponent<TimeBomb>();
     }
@@ -112,6 +113,11 @@ public class Network : MonoBehaviour
         string playerId = evt.data.GetField("token").str;
         bool isSelf = playerId.CompareTo(idForServer) == 0;
         timeBomb.showToken(isSelf, playerId);
+    }
+
+    public void onNewTurn(SocketIOEvent evt) {
+        string turnNumber = evt.data.GetField("tour").str;
+        timeBomb.initNewTurn(turnNumber);
     }
 
     public void setPseudoForServer(string pseudo) {

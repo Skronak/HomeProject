@@ -6,7 +6,7 @@ public class TimeBomb : MonoBehaviour
 {
 
     public List<GameObject> emptyPlayerSlot;
-    public GameObject [] revealedCardSpawn;
+    public GameObject[] revealedCardSpawn;
     public GameObject playerAvatarPrefab;
     public GameObject playerHandCardPrefab;
     public GameObject cardPrefab;
@@ -29,6 +29,8 @@ public class TimeBomb : MonoBehaviour
     private List<GameObject> currentCardRevealed;
     public GameObject token;
     private GameObject currentPlayerWithToken;
+    public RectTransform newTurnImage;
+    public static bool IsInputEnabled = true;
 
     void Start()
     {
@@ -50,10 +52,11 @@ public class TimeBomb : MonoBehaviour
         playerMap = new Dictionary<string, GameObject>();
     }
 
-    public void GeneratePlayerHand(PlayerHand playerHand) {
+    public void GeneratePlayerHand(PlayerHand playerHand)
+    {
         initNewTurn();
 
-        Vector3 lastPosition = playerPreviewHandSpawn.transform.position;         
+        Vector3 lastPosition = playerPreviewHandSpawn.transform.position;
         for (int i = 0; i < playerHand.hand.Length; i++)
         {
             PlayerCard playerCard = playerHand.hand[i];
@@ -78,14 +81,15 @@ public class TimeBomb : MonoBehaviour
     public void GenerateOtherPlayersHand(OtherPlayerHands otherPlayerHands)
     {
         for (int i = 0; i < otherPlayerHands.otherPlayerHand.Length; i++)
-        {   
-            Shuffle(otherPlayerHands.otherPlayerHand);            
+        {
+            Shuffle(otherPlayerHands.otherPlayerHand);
             OtherPlayerHand otherPlayerHand = otherPlayerHands.otherPlayerHand[i];
-           
+
             GameObject playerGO = playerMap[otherPlayerHand.playerId];
 
             Vector3 lastPosition = playerGO.transform.GetChild(0).gameObject.transform.position; // accede a CardSpawn du prefab...
-            foreach (int cardId in otherPlayerHand.cardId) {
+            foreach (int cardId in otherPlayerHand.cardId)
+            {
                 GameObject newCard = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
                 newCard.GetComponent<Card>().isHidden = true;
                 lastPosition.x = lastPosition.x + 2; // magic number
@@ -101,7 +105,8 @@ public class TimeBomb : MonoBehaviour
     public void AddPlayer(string id, string pseudo)
     {
 
-        if (!playerMap.ContainsKey(id)) {			
+        if (!playerMap.ContainsKey(id))
+        {
             GameObject location = emptyPlayerSlot[0];
             GameObject newPlayer = Instantiate(playerAvatarPrefab, new Vector3(location.transform.position.x, location.transform.position.y, 2), Quaternion.identity);
             Player player = newPlayer.GetComponent<Player>();
@@ -126,49 +131,59 @@ public class TimeBomb : MonoBehaviour
         emptyPlayerSlot.Add(emptySeat);
     }
 
-    public void showRole(string role) {
-        if (role.Equals("1")) {
+    public void showRole(string role)
+    {
+        if (role.Equals("1"))
+        {
             (rolesImage[0]).SetActive(false);
             (rolesImage[1]).SetActive(true);
             Camera.main.backgroundColor = Color.red;
             playerPreviewHandSpawn = playerPreviewHandSpawnBad;
         }
-        else {
+        else
+        {
             (rolesImage[0]).SetActive(true);
             (rolesImage[1]).SetActive(false);
             Camera.main.backgroundColor = Color.blue;
             playerPreviewHandSpawn = playerPreviewHandSpawnGood;
         }
     }
-    
-    public void cleanBoard() {
-        for (int i = 0; i < currentPlayerHandCards.Count; ++i) {
-                Destroy(currentPlayerHandCards[i].gameObject);
+
+    public void cleanBoard()
+    {
+        for (int i = 0; i < currentPlayerHandCards.Count; ++i)
+        {
+            Destroy(currentPlayerHandCards[i].gameObject);
         }
         currentPlayerHandCards.Clear();
 
-        foreach(KeyValuePair<string, GameObject> cardGameObject in currentCardsInGame) {
+        foreach (KeyValuePair<string, GameObject> cardGameObject in currentCardsInGame)
+        {
             Destroy(cardGameObject.Value);
         }
         currentCardsInGame.Clear();
 
-        for (int i = 0; i < currentCardRevealedThisTurn.Count; ++i) {
-                currentCardRevealed.Add(currentCardRevealedThisTurn[i].gameObject);
-                currentCardRevealedThisTurn[i].SetActive(false);
-                //Destroy(currentCardRevealed[i].gameObject);
+        for (int i = 0; i < currentCardRevealedThisTurn.Count; ++i)
+        {
+            currentCardRevealed.Add(currentCardRevealedThisTurn[i].gameObject);
+            currentCardRevealedThisTurn[i].SetActive(false);
+            //Destroy(currentCardRevealed[i].gameObject);
         }
         currentCardRevealedThisTurn.Clear();
     }
 
-    public void HoverCard(string cardId) {
-        if (currentHoverObject!= null) {
+    public void HoverCard(string cardId)
+    {
+        if (currentHoverObject != null)
+        {
             currentHoverObject.GetComponent<Selectable>().RemoveCardHoverEffect();
         }
         currentHoverObject = currentCardsInGame[cardId];
         currentCardsInGame[cardId].GetComponent<Selectable>().AddCardHoverEffect();
     }
 
-    public void RevealCard(PlayerCard playerCard) {
+    public void RevealCard(PlayerCard playerCard)
+    {
         currentHoverObject = currentCardsInGame[playerCard.id];
         GameObject cardRevealedGO = Instantiate(cardPrefab, new Vector3(currentHoverObject.transform.position.x, currentHoverObject.transform.position.y, 2), Quaternion.identity);
         cardRevealedGO.transform.localScale = currentHoverObject.transform.localScale;
@@ -180,30 +195,51 @@ public class TimeBomb : MonoBehaviour
 
         LeanTween.moveLocal(cardRevealedGO, revealedCardSpawn[currentCardRevealedThisTurn.Count].transform.position, 0.5f).setDelay(2f);
     }
-  
-    public void showToken(bool isSelf, string playerId) {
-        if(isSelf) {
+
+    public void showToken(bool isSelf, string playerId)
+    {
+        if (isSelf)
+        {
             token.SetActive(true);
             token.transform.position = Vector3.zero;
             token.transform.localScale = Vector3.zero;
 
-            LeanTween.scale(gameObject, new Vector3(2,2,0), 1f);
-            LeanTween.moveLocal(gameObject, new Vector3(-62,-81,0),1).setDelay(1);
-            LeanTween.scale(gameObject, new Vector3(1,1,0),1f).setDelay(1f);
+            LeanTween.scale(gameObject, new Vector3(2, 2, 0), 1f);
+            LeanTween.moveLocal(gameObject, new Vector3(-62, -81, 0), 1).setDelay(1);
+            LeanTween.scale(gameObject, new Vector3(1, 1, 0), 1f).setDelay(1f);
 
-            if (currentPlayerWithToken!=null) {
+            if (currentPlayerWithToken != null)
+            {
                 currentPlayerWithToken.GetComponent<Player>().token.enabled = false;
             }
-        } else {
+        }
+        else
+        {
             token.SetActive(false);
             playerMap[playerId].GetComponent<Player>().token.enabled = true;
             currentPlayerWithToken = playerMap[playerId];
         }
     }
 
-    public void initNewTurn() {
+    public void initNewTurn(string turnNumber)
+    {
+        UITurnPopAnimation(turnNumber);
         cleanBoard();
-        token.SetActive(false);
+    }
+
+    public void UITurnPopAnimation(string turnNumber)
+    {
+        newTurnImage.localScale = Vector3.zero;
+        newTurnImage.gameObject.SetActive(true);
+        TimeBomb.IsInputEnabled = false;
+        LeanTween.scale(newTurnImage, Vector3.one * 2, 1f);
+        LeanTween.delayedCall(2, PrepareNewTurn);
+    }
+
+    public void PrepareNewTurn()
+    {
+        newTurnImage.gameObject.SetActive(false);
+        TimeBomb.IsInputEnabled = true;
     }
 
     private void Shuffle<T>(T[] list)
@@ -217,6 +253,14 @@ public class TimeBomb : MonoBehaviour
             T temp = list[k];
             list[k] = list[n];
             list[n] = temp;
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            initNewTurn();
         }
     }
 }
