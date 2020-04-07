@@ -7,6 +7,8 @@ public class Network : MonoBehaviour
     SocketIOComponent socket;
 
     private TimeBomb timeBomb;
+    private UIManager uiManager;
+    
     private string pseudoForServer;
     public string idForServer;
 
@@ -28,9 +30,13 @@ public class Network : MonoBehaviour
         socket.On("cardHover", onCardHover);
         socket.On("revealCard", onCardReveal);
         socket.On("token", onTokenDistributed);
-        socket.On("newTour", onNewTurn);
+        socket.On("newTurnAvailable", onNewTurnAvailable);
+        socket.On("newTurn", onNewTurn);
+        socket.On("endTurn", onEndTurn);
+        socket.On("defausse", onDefausseSent);
 
-        timeBomb = GameObject.Find("Game").GetComponent<TimeBomb>();
+        timeBomb = GameObject.Find("GameManager").GetComponent<TimeBomb>();
+        uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
     }
 
     // This is the listener function definition
@@ -90,14 +96,6 @@ public class Network : MonoBehaviour
         timeBomb.showRole(role);
     }
 
-    public void joinGame() {
-        if (pseudoForServer == null) {
-            pseudoForServer = "noname";
-        }
-
-        socket.Emit("register", JSONObject.CreateStringObject(pseudoForServer));
-    }
-
     public void onCardHover(SocketIOEvent evt) {
         string cardId = evt.data.GetField("hover").str;
         timeBomb.HoverCard(cardId);
@@ -116,12 +114,42 @@ public class Network : MonoBehaviour
     }
 
     public void onNewTurn(SocketIOEvent evt) {
-        string turnNumber = evt.data.GetField("tour").str;
-        timeBomb.initNewTurn(turnNumber);
+        string turnNumber = evt.data.GetField("turn").ToString();
+        Debug.Log("Turn "+ turnNumber);
+        uiManager.hideNextTurnButton();
+        uiManager.hideEndTurnBanner();
+        uiManager.showNewTurnBanner(turnNumber);
+
+        timeBomb.initNewTurn();
+    }
+
+    public void onEndTurn(SocketIOEvent evt) {
+        uiManager.showEndTurnBanner();
+    }
+
+    public void onNewTurnAvailable(SocketIOEvent evt) {
+        uiManager.showNextTurnButton();
+    }
+
+    public void onDefausseSent(SocketIOEvent evt) {
+//        uiManager.updateWireCounter();
+        timeBomb.initDefausse();
     }
 
     public void setPseudoForServer(string pseudo) {
         pseudoForServer = pseudo;
+    }
+
+    public void joinGame() {
+        if (pseudoForServer == null) {
+            pseudoForServer = "noname";
+        }
+
+        socket.Emit("register", JSONObject.CreateStringObject(pseudoForServer));
+    }
+
+    public void triggerNextTurn() {
+        socket.Emit("newTurn");
     }
 
 }

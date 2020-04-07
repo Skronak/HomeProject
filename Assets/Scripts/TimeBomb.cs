@@ -29,7 +29,7 @@ public class TimeBomb : MonoBehaviour
     private List<GameObject> currentCardRevealed;
     public GameObject token;
     private GameObject currentPlayerWithToken;
-    public RectTransform newTurnImage;
+//    public RectTransform newTurnImage;
     public static bool IsInputEnabled = true;
 
     void Start()
@@ -54,8 +54,6 @@ public class TimeBomb : MonoBehaviour
 
     public void GeneratePlayerHand(PlayerHand playerHand)
     {
-        initNewTurn();
-
         Vector3 lastPosition = playerPreviewHandSpawn.transform.position;
         for (int i = 0; i < playerHand.hand.Length; i++)
         {
@@ -82,8 +80,8 @@ public class TimeBomb : MonoBehaviour
     {
         for (int i = 0; i < otherPlayerHands.otherPlayerHand.Length; i++)
         {
-            Shuffle(otherPlayerHands.otherPlayerHand);
             OtherPlayerHand otherPlayerHand = otherPlayerHands.otherPlayerHand[i];
+            Shuffle(otherPlayerHand.cardId);
 
             GameObject playerGO = playerMap[otherPlayerHand.playerId];
 
@@ -104,7 +102,6 @@ public class TimeBomb : MonoBehaviour
 
     public void AddPlayer(string id, string pseudo)
     {
-
         if (!playerMap.ContainsKey(id))
         {
             GameObject location = emptyPlayerSlot[0];
@@ -200,48 +197,35 @@ public class TimeBomb : MonoBehaviour
     {
         if (isSelf)
         {
-            token.SetActive(true);
-            token.transform.position = Vector3.zero;
-            token.transform.localScale = Vector3.zero;
+            token.gameObject.SetActive(true);
+            /*            token.transform.position = Vector3.zero;
+                        token.transform.localScale = Vector3.zero;
 
-            LeanTween.scale(gameObject, new Vector3(2, 2, 0), 1f);
-            LeanTween.moveLocal(gameObject, new Vector3(-62, -81, 0), 1).setDelay(1);
-            LeanTween.scale(gameObject, new Vector3(1, 1, 0), 1f).setDelay(1f);
-
+                        LeanTween.scale(gameObject, new Vector3(2, 2, 0), 1f);
+                        LeanTween.moveLocal(gameObject, new Vector3(-62, -81, 0), 1).setDelay(1);
+                        LeanTween.scale(gameObject, new Vector3(1, 1, 0), 1f).setDelay(1f);
+            */
             if (currentPlayerWithToken != null)
             {
-                currentPlayerWithToken.GetComponent<Player>().token.enabled = false;
+                currentPlayerWithToken.GetComponent<Player>().token.SetActive(false);
             }
         }
         else
         {
-            token.SetActive(false);
-            playerMap[playerId].GetComponent<Player>().token.enabled = true;
+            token.gameObject.SetActive(false);
+            playerMap[playerId].GetComponent<Player>().token.gameObject.SetActive(true);
             currentPlayerWithToken = playerMap[playerId];
         }
     }
 
-    public void initNewTurn(string turnNumber)
+    public void initNewTurn()
     {
-        UITurnPopAnimation(turnNumber);
         cleanBoard();
     }
 
-    public void UITurnPopAnimation(string turnNumber)
-    {
-        newTurnImage.localScale = Vector3.zero;
-        newTurnImage.gameObject.SetActive(true);
-        TimeBomb.IsInputEnabled = false;
-        LeanTween.scale(newTurnImage, Vector3.one * 2, 1f);
-        LeanTween.delayedCall(2, PrepareNewTurn);
+    public void initDefausse() {
+        Debug.Log("defausse");
     }
-
-    public void PrepareNewTurn()
-    {
-        newTurnImage.gameObject.SetActive(false);
-        TimeBomb.IsInputEnabled = true;
-    }
-
     private void Shuffle<T>(T[] list)
     {
         System.Random random = new System.Random();
@@ -256,11 +240,4 @@ public class TimeBomb : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            initNewTurn();
-        }
-    }
 }
