@@ -12,7 +12,9 @@ public class UIManager : MonoBehaviour
     public RectTransform newTurnImage;
     public TextMeshProUGUI diffusingWireText;
     public TextMeshProUGUI secureWireText;
-
+    public string maxDefusingWire;
+    public string maxSecureWire;
+    
 	void Start()
 	{
         socket = GameObject.Find("SocketIO").GetComponent<SocketIOComponent> ();
@@ -61,9 +63,9 @@ public class UIManager : MonoBehaviour
         TimeBomb.IsInputEnabled = true;
     }
 
-    public void updateWireCounter(string secureCounter, string maxSecureCounter, string difusingCounter, string maxDifusingCounter) {
-        secureWireText.SetText("Secure wire: "+secureCounter+"/"+maxSecureCounter);
-        secureWireText.SetText("Defusing wire: "+difusingCounter+"/"+maxDifusingCounter);
+    public void updateWireCounter(string secureCounter, string difusingCounter) {
+        secureWireText.SetText("Secure wire: "+secureCounter+"/"+maxSecureWire);
+        diffusingWireText.SetText("Defusing wire: "+difusingCounter+"/"+maxDefusingWire);
     }
 
 }

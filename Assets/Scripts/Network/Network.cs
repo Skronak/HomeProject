@@ -26,7 +26,7 @@ public class Network : MonoBehaviour
         socket.On("sendCard", onNewHandDistributed);
         socket.On("otherCard", onOtherCardDistributed);
         socket.On("roleAssigment", onRoleAssignement);
-        socket.On("startGame", onStartGame);
+        socket.On("gameStarted", onStartGame);
         socket.On("cardHover", onCardHover);
         socket.On("revealCard", onCardReveal);
         socket.On("token", onTokenDistributed);
@@ -85,6 +85,13 @@ public class Network : MonoBehaviour
 
     void onStartGame(SocketIOEvent evt)
     {
+        string maxSecureWire = evt.data.GetField("maxSecureWire").ToString();
+        string maxDefusingWire = evt.data.GetField("maxDefusingWire").ToString();
+        uiManager.maxSecureWire = maxSecureWire;
+        uiManager.maxDefusingWire = maxDefusingWire;
+        uiManager.diffusingWireText.gameObject.SetActive(true);
+        uiManager.secureWireText.gameObject.SetActive(true);
+        uiManager.updateWireCounter("0", "0");
         timeBomb.startGame();
     }
 
@@ -132,8 +139,9 @@ public class Network : MonoBehaviour
     }
 
     public void onDefausseSent(SocketIOEvent evt) {
-//        uiManager.updateWireCounter();
-        timeBomb.initDefausse();
+        string secureWire = evt.data.GetField("secureWire").ToString();
+        string defusingWire = evt.data.GetField("defusingWire").ToString();
+        uiManager.updateWireCounter(secureWire, defusingWire);
     }
 
     public void setPseudoForServer(string pseudo) {

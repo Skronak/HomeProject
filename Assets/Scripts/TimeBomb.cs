@@ -47,9 +47,9 @@ public class TimeBomb : MonoBehaviour
     {
         console.sendMessageToConsole("system", "Game start");
 
-        currentPlayerHandCards = new List<GameObject>();
-        currentCardsInGame = new Dictionary<string, GameObject>();
-        playerMap = new Dictionary<string, GameObject>();
+//        currentPlayerHandCards = new List<GameObject>();
+//        currentCardsInGame = new Dictionary<string, GameObject>();
+//        playerMap = new Dictionary<string, GameObject>();
     }
 
     public void GeneratePlayerHand(PlayerHand playerHand)
@@ -223,9 +223,6 @@ public class TimeBomb : MonoBehaviour
         cleanBoard();
     }
 
-    public void initDefausse() {
-        Debug.Log("defausse");
-    }
     private void Shuffle<T>(T[] list)
     {
         System.Random random = new System.Random();
