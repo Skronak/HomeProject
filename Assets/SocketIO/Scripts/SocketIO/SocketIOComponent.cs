@@ -120,6 +120,20 @@ namespace SocketIO
 			#endif
 		}
 
+		public void changeUrl(string url) {
+			Close();
+
+			this.url = url;
+			ws = new WebSocket(url);
+			ws.OnOpen += OnOpen;
+			ws.OnMessage += OnMessage;
+			ws.OnError += OnError;
+			ws.OnClose += OnClose;
+			wsConnected = false;
+
+			Connect();
+		}
+
 		public virtual void Start()
 		{
 			if (autoConnect) { Connect(); }

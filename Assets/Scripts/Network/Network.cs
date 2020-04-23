@@ -4,13 +4,14 @@ using SocketIO;
 
 public class Network : MonoBehaviour
 {
-    SocketIOComponent socket;
-
+    private SocketIOComponent socket;
     private TimeBomb timeBomb;
     private UIManager uiManager;
     
     private string pseudoForServer;
-    public string idForServer;
+    private string idForServer;
+    private string serverUrl;
+    public GameObject connectionIcon;
 
     public static string ClientID { get; private set; }
 
@@ -37,6 +38,7 @@ public class Network : MonoBehaviour
 
         timeBomb = GameObject.Find("GameManager").GetComponent<TimeBomb>();
         uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
+
     }
 
     // This is the listener function definition
@@ -44,6 +46,7 @@ public class Network : MonoBehaviour
     {
         Debug.Log("You are connected: " + evt.data.GetField("id"));
         idForServer = evt.data.GetField("id").str;
+        connectionIcon.gameObject.SetActive(true);
     }
 
     void onPlayerConnection(SocketIOEvent evt)
@@ -148,7 +151,20 @@ public class Network : MonoBehaviour
         pseudoForServer = pseudo;
     }
 
+    public void setUrlForServer(string url) {
+        serverUrl = url;
+    }
+
+    public void updateConnection() {
+        connectionIcon.gameObject.SetActive(false);
+        socket.changeUrl(serverUrl);
+    }
+
     public void joinGame() {
+        if (serverUrl!=null) {
+            socket.changeUrl(serverUrl);
+        }
+
         if (pseudoForServer == null) {
             pseudoForServer = "noname";
         }
