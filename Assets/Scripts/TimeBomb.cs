@@ -21,21 +21,20 @@ public class TimeBomb : MonoBehaviour
     public GameObject[] rolesImage;
     public Dictionary<string, GameObject> playerMap;
     public GameObject playersContainer;
-    public GameObject consoleGameobject;
     public GameObject socketIOGO;
-    private CustomConsole console;
     private SocketIOComponent socketIoComponent;
     private GameObject currentHoverObject;
     private List<GameObject> currentCardRevealed;
     public GameObject token;
     private GameObject currentPlayerWithToken;
-//    public RectTransform newTurnImage;
     public static bool IsInputEnabled = true;
+    private UIManager uiManager;
 
     void Start()
     {
-        console = consoleGameobject.GetComponent<CustomConsole>();
         socketIoComponent = socketIOGO.GetComponent<SocketIOComponent>();
+        uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
+
         currentPlayerHandCards = new List<GameObject>();
         currentCardRevealed = new List<GameObject>();
         currentCardRevealedThisTurn = new List<GameObject>();
@@ -45,8 +44,6 @@ public class TimeBomb : MonoBehaviour
 
     public void startGame()
     {
-        console.sendMessageToConsole("system", "Game start");
-
 //        currentPlayerHandCards = new List<GameObject>();
 //        currentCardsInGame = new Dictionary<string, GameObject>();
 //        playerMap = new Dictionary<string, GameObject>();
@@ -132,6 +129,7 @@ public class TimeBomb : MonoBehaviour
     {
         if (role.Equals("1"))
         {
+            uiManager.showBadInstruction();
             (rolesImage[0]).SetActive(false);
             (rolesImage[1]).SetActive(true);
             Camera.main.backgroundColor = Color.red;
@@ -139,6 +137,7 @@ public class TimeBomb : MonoBehaviour
         }
         else
         {
+            uiManager.showGoodInstruction();
             (rolesImage[0]).SetActive(true);
             (rolesImage[1]).SetActive(false);
             Camera.main.backgroundColor = Color.blue;

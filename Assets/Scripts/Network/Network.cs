@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using SocketIO;
 
 public class Network : MonoBehaviour
@@ -11,7 +10,6 @@ public class Network : MonoBehaviour
     private string pseudoForServer;
     private string idForServer;
     private string serverUrl;
-    public GameObject connectionIcon;
 
     public static string ClientID { get; private set; }
 
@@ -38,7 +36,6 @@ public class Network : MonoBehaviour
 
         timeBomb = GameObject.Find("GameManager").GetComponent<TimeBomb>();
         uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
-
     }
 
     // This is the listener function definition
@@ -46,7 +43,7 @@ public class Network : MonoBehaviour
     {
         Debug.Log("You are connected: " + evt.data.GetField("id"));
         idForServer = evt.data.GetField("id").str;
-        connectionIcon.gameObject.SetActive(true);
+        uiManager.connectionCheckIcon.gameObject.SetActive(true);
     }
 
     void onPlayerConnection(SocketIOEvent evt)
@@ -94,6 +91,7 @@ public class Network : MonoBehaviour
         uiManager.maxDefusingWire = maxDefusingWire;
         uiManager.diffusingWireText.gameObject.SetActive(true);
         uiManager.secureWireText.gameObject.SetActive(true);
+        uiManager.hideStartGameButton();
         uiManager.updateWireCounter("0", "0");
         timeBomb.startGame();
     }
@@ -156,12 +154,15 @@ public class Network : MonoBehaviour
     }
 
     public void updateConnection() {
-        connectionIcon.gameObject.SetActive(false);
+        uiManager.connectionCheckIcon.gameObject.SetActive(false);
+        if (serverUrl == null) {
+            serverUrl = socket.url;
+        }
         socket.changeUrl(serverUrl);
     }
 
     public void joinGame() {
-        if (serverUrl!=null) {
+        if (serverUrl != null) {
             socket.changeUrl(serverUrl);
         }
 
@@ -174,6 +175,10 @@ public class Network : MonoBehaviour
 
     public void triggerNextTurn() {
         socket.Emit("newTurn");
+    }
+
+    public void triggerStartGame(){
+    	socket.Emit("startGame");
     }
 
 }
