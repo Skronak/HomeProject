@@ -4,16 +4,14 @@ using SocketIO;
 
 public class TimeBomb : MonoBehaviour
 {
-
     public List<GameObject> emptyPlayerSlot;
     public GameObject[] revealedCardSpawn;
     public GameObject playerAvatarPrefab;
     public GameObject playerHandCardPrefab;
     public GameObject cardPrefab;
+    public GameObject handPrefab;
     public GameObject emptySeatPrefab;
-    public GameObject playerPreviewHandSpawnGood;
-    public GameObject playerPreviewHandSpawnBad;
-    private GameObject playerPreviewHandSpawn;
+    public GameObject playerPreviewHand;
     public GameObject[] playerHandCardsSpawn;
     private List<GameObject> currentPlayerHandCards; // TODO useless?
     private List<GameObject> currentCardRevealedThisTurn;
@@ -29,11 +27,13 @@ public class TimeBomb : MonoBehaviour
     private GameObject currentPlayerWithToken;
     public static bool IsInputEnabled = true;
     private UIManager uiManager;
+    private Network network;
 
     void Start()
     {
         socketIoComponent = socketIOGO.GetComponent<SocketIOComponent>();
         uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
+        network = GameObject.Find("SocketIO").GetComponent<Network>();
 
         currentPlayerHandCards = new List<GameObject>();
         currentCardRevealed = new List<GameObject>();
@@ -51,16 +51,19 @@ public class TimeBomb : MonoBehaviour
 
     public void GeneratePlayerHand(PlayerHand playerHand)
     {
-        Vector3 lastPosition = playerPreviewHandSpawn.transform.position;
+        IsInputEnabled = false;
+        Vector3 lastPosition = playerPreviewHand.transform.position;
         for (int i = 0; i < playerHand.hand.Length; i++)
         {
             PlayerCard playerCard = playerHand.hand[i];
 
             Transform spawnToReplace = playerHandCardsSpawn[i].transform;
-            GameObject playerCardGO = Instantiate(playerHandCardPrefab, new Vector3(spawnToReplace.position.x, spawnToReplace.position.y, 2), spawnToReplace.rotation);
-            playerCardGO.GetComponent<Card>().setCardType(playerCard.value);
-            playerCardGO.transform.parent = spawnToReplace;
+            GameObject playerCardGO = Instantiate(handPrefab, new Vector3(spawnToReplace.position.x, spawnToReplace.position.y, 2), spawnToReplace.rotation);
+            playerCardGO.transform.localScale = spawnToReplace.localScale;
+            playerCardGO.GetComponent<CardUi>().setCardType(playerCard.value);
+            playerCardGO.transform.SetParent(spawnToReplace);
             currentPlayerHandCards.Add(playerCardGO);
+            uiManager.showFlipCardButton();
 
             GameObject previewPlayerCardGO = Instantiate(playerHandCardPrefab, new Vector3(lastPosition.x, lastPosition.y, 2), Quaternion.identity);
             previewPlayerCardGO.GetComponent<Card>().isHidden = true;
@@ -69,6 +72,8 @@ public class TimeBomb : MonoBehaviour
             previewPlayerCardGO.GetComponent<Card>().cardId = playerCard.id;
             previewPlayerCardGO.AddComponent<Selectable>().socket = socketIoComponent;
             previewPlayerCardGO.GetComponent<Selectable>().isPlayerCard = true;
+            previewPlayerCardGO.transform.SetParent(playerPreviewHand.transform);
+            previewPlayerCardGO.SetActive(false);
             currentCardsInGame.Add(playerCard.id, previewPlayerCardGO);
         }
     }
@@ -91,7 +96,9 @@ public class TimeBomb : MonoBehaviour
                 newCard.GetComponent<Card>().playerId = otherPlayerHand.playerId;
                 newCard.GetComponent<Card>().cardId = cardId.ToString();
                 newCard.AddComponent<Selectable>().socket = socketIoComponent;
-                newCard.transform.parent = playerPreviewHandSpawn.transform;
+                newCard.transform.parent = playerGO.transform.GetChild(0).transform;
+                newCard.SetActive(false);
+
                 currentCardsInGame.Add(cardId.ToString(), newCard); // TODO moche de cast tostring
             }
         }
@@ -133,7 +140,6 @@ public class TimeBomb : MonoBehaviour
             (rolesImage[0]).SetActive(false);
             (rolesImage[1]).SetActive(true);
             Camera.main.backgroundColor = Color.red;
-            playerPreviewHandSpawn = playerPreviewHandSpawnBad;
         }
         else
         {
@@ -141,8 +147,33 @@ public class TimeBomb : MonoBehaviour
             (rolesImage[0]).SetActive(true);
             (rolesImage[1]).SetActive(false);
             Camera.main.backgroundColor = Color.blue;
-            playerPreviewHandSpawn = playerPreviewHandSpawnGood;
         }
+    }
+
+    // TODO a passer dans UI entierement
+    public void flipHand() {
+        uiManager.hideFlipButton();
+        for (int i = 0; i < currentPlayerHandCards.Count; ++i) {
+            uiManager.scaleDownAndDestroy(currentPlayerHandCards[i].gameObject);
+        }
+        
+        foreach(Transform playerCard in playerPreviewHand.transform)
+        {
+            playerCard.gameObject.SetActive(true);
+        }
+        network.triggerFlipHand();
+    }
+
+    public void flipHandForPlayer(string playerId) {
+        Transform otherPlayerCards = playerMap[playerId].transform.GetChild(0);
+        foreach(Transform playerCard in otherPlayerCards)
+        {
+            playerCard.gameObject.SetActive(true);
+        }
+    }
+
+    public void startTurn() {
+        IsInputEnabled = true;
     }
 
     public void cleanBoard()
@@ -197,13 +228,7 @@ public class TimeBomb : MonoBehaviour
         if (isSelf)
         {
             token.gameObject.SetActive(true);
-            /*            token.transform.position = Vector3.zero;
-                        token.transform.localScale = Vector3.zero;
 
-                        LeanTween.scale(gameObject, new Vector3(2, 2, 0), 1f);
-                        LeanTween.moveLocal(gameObject, new Vector3(-62, -81, 0), 1).setDelay(1);
-                        LeanTween.scale(gameObject, new Vector3(1, 1, 0), 1f).setDelay(1f);
-            */
             if (currentPlayerWithToken != null)
             {
                 currentPlayerWithToken.GetComponent<Player>().token.SetActive(false);

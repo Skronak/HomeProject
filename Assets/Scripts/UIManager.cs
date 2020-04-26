@@ -5,6 +5,7 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    public GameObject loginUi;
     public Transform uiRoot;
     private Network network;
     private GameObject currentGameObject;
@@ -20,6 +21,7 @@ public class UIManager : MonoBehaviour
     public GameObject endTurnPopUpPrefab;
     public GameObject nextTurnButtonPrefab;
     public GameObject startGameButtonPrefab;
+    public Button flipCardButton;
     private GameObject endTurnPopUp;
     private RectTransform newTurnPopUp;
     private GameObject nextTurnButton;
@@ -28,6 +30,11 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         network = GameObject.Find("SocketIO").GetComponent<Network>();
+    }
+
+    public void startGame() {
+        loginUi.SetActive(false);
+        showStartGameButton();
     }
 
     public void showNextTurnButton()
@@ -101,9 +108,16 @@ public class UIManager : MonoBehaviour
         LeanTween.delayedCall(2, PrepareNewTurn);
     }
 
+    public void showFlipCardButton(){
+        flipCardButton.gameObject.SetActive(true);
+    }
+
+    public void hideFlipButton() {
+        flipCardButton.gameObject.SetActive(false);
+    }
+
     public void PrepareNewTurn()
     {
-        currentGameObject = newTurnPopUp.gameObject;
         scaleDownAndDestroy(newTurnPopUp.gameObject);
         TimeBomb.IsInputEnabled = true;
     }
@@ -114,9 +128,8 @@ public class UIManager : MonoBehaviour
         diffusingWireText.SetText("Defusing wire: " + difusingCounter + "/" + maxDefusingWire);
     }
 
-    private void scaleDownAndDestroy(GameObject gameObject) {
-        currentGameObject = gameObject;
-        LeanTween.scale(currentGameObject, new Vector3(0, 0, 0), 1f).setOnComplete(DestroyGameObject);
+    public void scaleDownAndDestroy(GameObject gameObject) {
+        LeanTween.scale(gameObject, new Vector3(0, 0, 0), 1f).setDestroyOnComplete(true);
     }
 
     private void DisableGameObject()
@@ -127,6 +140,10 @@ public class UIManager : MonoBehaviour
     private void DestroyGameObject()
     {
         Destroy(currentGameObject);
+    }
+
+    public void flipCard() {
+
     }
 
 }

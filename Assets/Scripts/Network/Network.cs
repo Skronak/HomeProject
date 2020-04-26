@@ -10,8 +10,8 @@ public class Network : MonoBehaviour
     private string pseudoForServer;
     private string idForServer;
     private string serverUrl;
-
     public static string ClientID { get; private set; }
+    private bool isConnected;
 
     void Start()
     {
@@ -33,6 +33,8 @@ public class Network : MonoBehaviour
         socket.On("newTurn", onNewTurn);
         socket.On("endTurn", onEndTurn);
         socket.On("defausse", onDefausseSent);
+        socket.On("handFlip", onPlayerHandFlip);
+        socket.On("allHandFlipped", onAllHandFlipped);
 
         timeBomb = GameObject.Find("GameManager").GetComponent<TimeBomb>();
         uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
@@ -41,6 +43,7 @@ public class Network : MonoBehaviour
     // This is the listener function definition
     void onConnectionEstabilished(SocketIOEvent evt)
     {
+        isConnected = true;
         Debug.Log("You are connected: " + evt.data.GetField("id"));
         idForServer = evt.data.GetField("id").str;
         uiManager.connectionCheckIcon.gameObject.SetActive(true);
@@ -145,15 +148,27 @@ public class Network : MonoBehaviour
         uiManager.updateWireCounter(secureWire, defusingWire);
     }
 
+    void onPlayerHandFlip(SocketIOEvent evt)
+    {
+        string id = evt.data["id"].str;       
+        timeBomb.flipHandForPlayer(id);
+    }
+
+    void onAllHandFlipped(SocketIOEvent evt) {
+        timeBomb.startTurn();
+    }
+
     public void setPseudoForServer(string pseudo) {
         pseudoForServer = pseudo;
     }
 
     public void setUrlForServer(string url) {
+        isConnected = false;
         serverUrl = url;
     }
 
     public void updateConnection() {
+        isConnected = false;
         uiManager.connectionCheckIcon.gameObject.SetActive(false);
         if (serverUrl == null) {
             serverUrl = socket.url;
@@ -170,7 +185,10 @@ public class Network : MonoBehaviour
             pseudoForServer = "noname";
         }
 
-        socket.Emit("register", JSONObject.CreateStringObject(pseudoForServer));
+        if (isConnected == true) {
+            socket.Emit("register", JSONObject.CreateStringObject(pseudoForServer));
+            uiManager.startGame();
+        }
     }
 
     public void triggerNextTurn() {
@@ -179,6 +197,10 @@ public class Network : MonoBehaviour
 
     public void triggerStartGame(){
     	socket.Emit("startGame");
+    }
+
+    public void triggerFlipHand() {
+        socket.Emit("flipHand");
     }
 
 }
