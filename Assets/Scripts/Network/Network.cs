@@ -35,6 +35,8 @@ public class Network : MonoBehaviour
         socket.On("defausse", onDefausseSent);
         socket.On("handFlip", onPlayerHandFlip);
         socket.On("allHandFlipped", onAllHandFlipped);
+        socket.On("GoodGuysWin", onGoodGuysWin);
+        socket.On("BadGuysWin", onBadGuysWin);
 
         timeBomb = GameObject.Find("GameManager").GetComponent<TimeBomb>();
         uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
@@ -95,6 +97,9 @@ public class Network : MonoBehaviour
         uiManager.diffusingWireText.gameObject.SetActive(true);
         uiManager.secureWireText.gameObject.SetActive(true);
         uiManager.hideStartGameButton();
+        uiManager.hideRestartGameButton();
+        uiManager.hideGoodWin();
+        uiManager.hideBadWin();
         uiManager.updateWireCounter("0", "0");
         timeBomb.startGame();
     }
@@ -156,6 +161,14 @@ public class Network : MonoBehaviour
 
     void onAllHandFlipped(SocketIOEvent evt) {
         timeBomb.startTurn();
+    }
+
+    void onGoodGuysWin(SocketIOEvent evt) {
+        uiManager.showGoodWin();
+    }
+
+    void onBadGuysWin(SocketIOEvent evt) {
+        uiManager.showBadWin();
     }
 
     public void setPseudoForServer(string pseudo) {

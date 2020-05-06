@@ -44,9 +44,12 @@ public class TimeBomb : MonoBehaviour
 
     public void startGame()
     {
-//        currentPlayerHandCards = new List<GameObject>();
-//        currentCardsInGame = new Dictionary<string, GameObject>();
-//        playerMap = new Dictionary<string, GameObject>();
+        cleanBoard();
+
+        currentPlayerHandCards = new List<GameObject>();
+        currentCardRevealed = new List<GameObject>();
+        currentCardRevealedThisTurn = new List<GameObject>();
+        currentCardsInGame = new Dictionary<string, GameObject>();
     }
 
     public void GeneratePlayerHand(PlayerHand playerHand)

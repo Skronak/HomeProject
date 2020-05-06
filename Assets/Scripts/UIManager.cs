@@ -22,10 +22,16 @@ public class UIManager : MonoBehaviour
     public GameObject nextTurnButtonPrefab;
     public GameObject startGameButtonPrefab;
     public Button flipCardButton;
+    public GameObject badWinPopUpPrefab;
+    public GameObject goodWinPopUpPrefab;
+    private GameObject badWinPopUp;
+    private GameObject goodWinPopUp;
+    public GameObject restartGameButtonPrefab;
     private GameObject endTurnPopUp;
     private RectTransform newTurnPopUp;
     private GameObject nextTurnButton;
     private GameObject startGameButton;
+    private GameObject restartGameButton;
 
     void Start()
     {
@@ -83,7 +89,7 @@ public class UIManager : MonoBehaviour
     }
 
     public void showStartGameButton() {
-        startGameButton = Instantiate(startGameButtonPrefab, new Vector3(Screen.width * 0.5f,Screen.height * 0.5f,0), Quaternion.identity);
+        startGameButton = Instantiate(startGameButtonPrefab, new Vector3(Screen.width * 0.5f, Screen.height * 0.5f,0), Quaternion.identity);
         currentGameObject = startGameButton;
         startGameButton.transform.SetParent(uiRoot);
         startGameButton.gameObject.GetComponent<Button>().onClick.AddListener(network.triggerStartGame);
@@ -93,6 +99,22 @@ public class UIManager : MonoBehaviour
     public void hideStartGameButton() {
         if (startGameButton != null) {
             scaleDownAndDestroy(startGameButton);
+        }
+    }
+
+    private void showRestartButton() {
+        restartGameButton = Instantiate(restartGameButtonPrefab, new Vector3(Screen.width * 0.5f,Screen.height * 0.2f,0), Quaternion.identity);
+        currentGameObject = restartGameButton;
+        restartGameButton.transform.SetParent(uiRoot);
+        restartGameButton.gameObject.SetActive(true);
+        restartGameButton.gameObject.GetComponent<Button>().onClick.AddListener(network.triggerStartGame);
+        restartGameButton.gameObject.GetComponent<Button>().onClick.AddListener(DestroyGameObject);
+        LeanTween.scale(restartGameButton, Vector3.one, 1f);
+    }
+
+    public void hideRestartGameButton() {
+        if (restartGameButton != null) {
+            scaleDownAndDestroy(restartGameButton);
         }
     }
 
@@ -114,6 +136,38 @@ public class UIManager : MonoBehaviour
 
     public void hideFlipButton() {
         flipCardButton.gameObject.SetActive(false);
+    }
+
+    public void showBadWin() {
+        TimeBomb.IsInputEnabled = false;
+        badWinPopUp = Instantiate(badWinPopUpPrefab, new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0), Quaternion.identity);
+        badWinPopUp.GetComponent<RectTransform>().localScale = Vector3.zero;
+        badWinPopUp.transform.SetParent(uiRoot);
+        LeanTween.scale(badWinPopUp, Vector3.one, 1f);
+
+        showRestartButton();
+    }
+
+    public void showGoodWin() {
+        TimeBomb.IsInputEnabled = false;
+        goodWinPopUp = Instantiate(goodWinPopUpPrefab, new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0), Quaternion.identity);
+        goodWinPopUp.GetComponent<RectTransform>().localScale = Vector3.zero;
+        goodWinPopUp.transform.SetParent(uiRoot);
+        LeanTween.scale(goodWinPopUp, Vector3.one, 1f);
+
+        showRestartButton();
+    }
+
+    public void hideBadWin() {
+        if (badWinPopUp != null) {
+            scaleDownAndDestroy(badWinPopUp);
+        }
+    }
+
+    public void hideGoodWin() {
+        if (goodWinPopUp != null) {
+            scaleDownAndDestroy(goodWinPopUp);
+        }
     }
 
     public void PrepareNewTurn()
