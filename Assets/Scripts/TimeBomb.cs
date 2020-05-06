@@ -22,7 +22,6 @@ public class TimeBomb : MonoBehaviour
     public GameObject socketIOGO;
     private SocketIOComponent socketIoComponent;
     private GameObject currentHoverObject;
-    private List<GameObject> currentCardRevealed;
     public GameObject token;
     private GameObject currentPlayerWithToken;
     public static bool IsInputEnabled = true;
@@ -36,7 +35,6 @@ public class TimeBomb : MonoBehaviour
         network = GameObject.Find("SocketIO").GetComponent<Network>();
 
         currentPlayerHandCards = new List<GameObject>();
-        currentCardRevealed = new List<GameObject>();
         currentCardRevealedThisTurn = new List<GameObject>();
         currentCardsInGame = new Dictionary<string, GameObject>();
         playerMap = new Dictionary<string, GameObject>();
@@ -45,11 +43,6 @@ public class TimeBomb : MonoBehaviour
     public void startGame()
     {
         cleanBoard();
-
-        currentPlayerHandCards = new List<GameObject>();
-        currentCardRevealed = new List<GameObject>();
-        currentCardRevealedThisTurn = new List<GameObject>();
-        currentCardsInGame = new Dictionary<string, GameObject>();
     }
 
     public void GeneratePlayerHand(PlayerHand playerHand)
@@ -195,9 +188,7 @@ public class TimeBomb : MonoBehaviour
 
         for (int i = 0; i < currentCardRevealedThisTurn.Count; ++i)
         {
-            currentCardRevealed.Add(currentCardRevealedThisTurn[i].gameObject);
             currentCardRevealedThisTurn[i].SetActive(false);
-            //Destroy(currentCardRevealed[i].gameObject);
         }
         currentCardRevealedThisTurn.Clear();
     }
