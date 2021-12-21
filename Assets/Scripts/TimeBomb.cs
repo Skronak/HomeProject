@@ -4,15 +4,15 @@ using SocketIO;
 
 public class TimeBomb : MonoBehaviour
 {
-    public List<GameObject> emptyPlayerSlot;
+    private List<GameObject> emptyPlayerSlot;
     public GameObject[] revealedCardSpawn;
     public GameObject playerAvatarPrefab;
     public GameObject playerHandCardPrefab;
     public GameObject cardPrefab;
     public GameObject handPrefab;
     public GameObject emptySeatPrefab;
-    public GameObject playerPreviewHand;
-    public GameObject[] playerHandCardsSpawn;
+    private GameObject playerPreviewHand;
+    private GameObject[] playerHandCardsSpawn;
     private List<GameObject> currentPlayerHandCards; // TODO useless?
     private List<GameObject> currentCardRevealedThisTurn;
     private Dictionary<string, GameObject> currentCardsInGame;
@@ -27,8 +27,10 @@ public class TimeBomb : MonoBehaviour
     public static bool IsInputEnabled = true;
     private UIManager uiManager;
     private Network network;
+    private GameObject emptyPlayerSlotRoot;
+    private GameObject playerHandCardSpawnRoot;
 
-    void Start()
+    void Awake()
     {
         socketIoComponent = socketIOGO.GetComponent<SocketIOComponent>();
         uiManager = GameObject.Find("GameManager").GetComponent<UIManager>();
@@ -38,6 +40,39 @@ public class TimeBomb : MonoBehaviour
         currentCardRevealedThisTurn = new List<GameObject>();
         currentCardsInGame = new Dictionary<string, GameObject>();
         playerMap = new Dictionary<string, GameObject>();
+        emptyPlayerSlot = new List<GameObject>();      
+
+        emptyPlayerSlotRoot = GameObject.Find("Players - Spawn"); 
+        foreach (Transform child in emptyPlayerSlotRoot.transform) {
+            emptyPlayerSlot.Add(child.gameObject);
+        }
+
+        playerPreviewHand = GameObject.Find("[Player Flipped Hand]");
+
+    }
+
+    void loadGameObjects(Object[] array, string name) {
+        GameObject root = GameObject.Find(name);
+        array = new GameObject[root.transform.childCount];
+        for (int i=0; i<=root.transform.childCount;i++) {
+            array[i] = root.transform.GetChild(i).gameObject;
+        }
+
+    } 
+    void Start()
+    {
+        GameObject playerHandCardsSpawnRoot = GameObject.Find("[PlayerHand]");
+        playerHandCardsSpawn = new GameObject[playerHandCardsSpawnRoot.transform.childCount];
+        for (int i=0; i<playerHandCardsSpawnRoot.transform.childCount; i++) {
+            playerHandCardsSpawn[i] = playerHandCardsSpawnRoot.transform.GetChild(i).gameObject;
+        }
+
+        GameObject revealedCardSpawnRoot = GameObject.Find("[RevealedCard - Spawn]");
+        revealedCardSpawn = new GameObject[revealedCardSpawnRoot.transform.childCount];
+        for (int i=0; i<revealedCardSpawnRoot.transform.childCount;i++) {
+            revealedCardSpawn[i] = revealedCardSpawnRoot.transform.GetChild(i).gameObject;
+        }
+
     }
 
     public void startGame()
